@@ -47,8 +47,8 @@ end
 function View:draw()
     gfx.clear(gfx.kColorWhite)
     if listView:getSelectedRow() ~= viewModel.selectedIdx then
-        listView:setSelectedRow(viewModel.selectedTrack)
-        listView:scrollToRow(viewModel.selectedTrack)
+        listView:setSelectedRow(viewModel.selectedIdx)
+        listView:scrollToRow(viewModel.selectedIdx)
     end
     listView:drawInRect(0,0,400,240)
 end

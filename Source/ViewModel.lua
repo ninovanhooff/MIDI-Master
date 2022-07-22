@@ -24,7 +24,7 @@ function ViewModel:init(sequence)
     for i = 1, self.numTracks do
         self.trackProps[i] = { isMuted = false }
     end
-    self.selectedTrack = 1
+    self.selectedIdx = 1
 end
 
 function ViewModel:getTrack(trackNum)
@@ -32,7 +32,7 @@ function ViewModel:getTrack(trackNum)
 end
 
 function ViewModel:isMuted(trackNum)
-    return self.trackPropms[trackNum].isMuted
+    return self.trackProps[trackNum].isMuted
 end
 
 function ViewModel:setMuted(trackNum, muted)
@@ -46,15 +46,15 @@ function ViewModel:toggleMuted(trackNum)
 end
 
 function ViewModel:update()
-    if justPressed(buttonDown) and self.selectedTrack < self.numTracks then
-        self.selectedTrack = self.selectedTrack + 1
-    elseif justPressed(buttonUp) and self.selectedTrack > 1 then
-        self.selectedTrack = self.selectedTrack - 1
+    if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
+        self.selectedIdx = self.selectedIdx + 1
+    elseif justPressed(buttonUp) and self.selectedIdx > 1 then
+        self.selectedIdx = self.selectedIdx - 1
     end
 end
 
 function ViewModel:keyReleased(key)
     if key == "m" then
-        self:toggleMuted(self.selectedTrack)
+        self:toggleMuted(self.selectedIdx)
     end
 end
