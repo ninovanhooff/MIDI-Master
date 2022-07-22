@@ -19,9 +19,11 @@ local buttonUp <const> = playdate.kButtonUp
 
 class("ViewModel").extends()
 
-function ViewModel:init(sequence)
-    self.sequence = sequence
-    self.numTracks = sequence:getTrackCount()
+function ViewModel:init(midiPath)
+    self.sequence = loadMidi(midiPath)
+    print("Sequence length (steps)", self.sequence:getLength())
+    print("Sequence tempo", self.sequence:getTempo())
+    self.numTracks = self.sequence:getTrackCount()
     self.trackProps = {}
     for i = 1, self.numTracks do
         local synth
@@ -37,6 +39,7 @@ function ViewModel:init(sequence)
         }
     end
     self.selectedIdx = 1
+    self.sequence:play()
 end
 
 function ViewModel:getCurrentStep()

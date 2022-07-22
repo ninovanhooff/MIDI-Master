@@ -9,12 +9,7 @@ local gfx = playdate.graphics
 playdate.display.setRefreshRate(50)
 gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
 
-local sequence = loadMidi('europe_finalcountdown_60s.mid')
-print("Sequence length (steps)", sequence:getLength())
-print("Sequence tempo", sequence:getTempo())
-sequence:play()
-
-local viewModel = ViewModel(sequence)
+local viewModel = ViewModel('europe_finalcountdown_60s.mid')
 local view = View(viewModel)
 
 function playdate.update()
