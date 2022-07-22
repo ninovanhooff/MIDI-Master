@@ -1,3 +1,5 @@
+lume = import "lume"
+import "Instrument"
 import "midi"
 import "ViewModel"
 import "View"

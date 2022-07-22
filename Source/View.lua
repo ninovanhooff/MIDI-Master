@@ -8,7 +8,7 @@ import "CoreLibs/object"
 import "CoreLibs/ui"
 
 local gfx <const> = playdate.graphics
-local gutter <const> = 4
+local gutter <const> = 2
 local buttonRadius <const> = 2
 local rowHeight <const> = 40
 local viewModel
@@ -33,7 +33,7 @@ function listView:drawCell(section, row, column, selected, x, y, width, height)
     gfx.setColor(playdate.graphics.kColorXOR)
     gfx.setImageDrawMode(gfx.kDrawModeNXOR) -- text
 
-    gfx.drawText("hoi", x + gutter, y + gutter)
+    gfx.drawText(viewModel:trackName(row), x + gutter, y + gutter)
 
     local buttonY = y + 20
     if viewModel.trackProps[row].isMuted then

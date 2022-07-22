@@ -6,6 +6,8 @@
 
 import "CoreLibs/object"
 
+local snd <const> = playdate.sound
+
 local justPressed <const> = playdate.buttonJustPressed
 -- local justReleased <const> = playdate.buttonJustReleased
 local buttonDown <const> = playdate.kButtonDown
@@ -22,9 +24,23 @@ function ViewModel:init(sequence)
     self.numTracks = sequence:getTrackCount()
     self.trackProps = {}
     for i = 1, self.numTracks do
-        self.trackProps[i] = { isMuted = false }
+        local synth
+        if i == 10 then
+            synth = "drums"
+        else
+            synth = snd.kWaveSawtooth
+        end
+        self.trackProps[i] = {
+            isMuted = false,
+            synth = synth
+        }
     end
     self.selectedIdx = 1
+end
+
+function ViewModel:trackName(idx)
+    local synth = self.trackProps[idx].synth
+    return string.format("%s : ", idx) .. synthNames[synth]
 end
 
 function ViewModel:getTrack(trackNum)

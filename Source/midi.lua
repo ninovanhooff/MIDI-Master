@@ -4,7 +4,7 @@
 --- DateTime: 22/07/2022 14:45
 ---
 
-local snd = playdate.sound
+local snd <const> = playdate.sound
 
 function newsynth()
     local s = snd.synth.new(snd.kWaveSawtooth)
