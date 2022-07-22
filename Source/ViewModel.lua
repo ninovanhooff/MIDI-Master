@@ -7,13 +7,13 @@
 import "CoreLibs/object"
 
 local justPressed <const> = playdate.buttonJustPressed
-local justReleased <const> = playdate.buttonJustReleased
+-- local justReleased <const> = playdate.buttonJustReleased
 local buttonDown <const> = playdate.kButtonDown
 local buttonUp <const> = playdate.kButtonUp
-local buttonLeft <const> = playdate.kButtonLeft
-local buttonRight <const> = playdate.kButtonRight
-local buttonA <const> = playdate.kButtonA
-local buttonB <const> = playdate.kButtonB
+--local buttonLeft <const> = playdate.kButtonLeft
+--local buttonRight <const> = playdate.kButtonRight
+--local buttonA <const> = playdate.kButtonA
+--local buttonB <const> = playdate.kButtonB
 
 class("ViewModel").extends()
 
@@ -22,13 +22,27 @@ function ViewModel:init(sequence)
     self.numTracks = sequence:getTrackCount()
     self.trackProps = {}
     for i = 1, self.numTracks do
-        self.trackProps[i] = { muted = false }
+        self.trackProps[i] = { isMuted = false }
     end
     self.selectedTrack = 1
 end
 
+function ViewModel:getTrack(trackNum)
+    return self.sequence:getTrackAtIndex(trackNum)
+end
+
 function ViewModel:isMuted(trackNum)
-    return self.trackProps[trackNum].isMuted
+    return self.trackPropms[trackNum].isMuted
+end
+
+function ViewModel:setMuted(trackNum, muted)
+    self.trackProps[trackNum].isMuted = muted
+    self:getTrack(trackNum):setMuted(muted)
+end
+
+function ViewModel:toggleMuted(trackNum)
+    local isMuted = self:isMuted(trackNum)
+    self:setMuted(trackNum, not isMuted)
 end
 
 function ViewModel:update()
@@ -36,5 +50,11 @@ function ViewModel:update()
         self.selectedTrack = self.selectedTrack + 1
     elseif justPressed(buttonUp) and self.selectedTrack > 1 then
         self.selectedTrack = self.selectedTrack - 1
+    end
+end
+
+function ViewModel:keyReleased(key)
+    if key == "m" then
+        self:toggleMuted(self.selectedTrack)
     end
 end

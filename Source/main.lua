@@ -17,3 +17,8 @@ function playdate.update()
     view:draw()
     playdate.timer:updateTimers()
 end
+
+function playdate.keyReleased(key)
+    print("Released " .. key .. " key")
+    viewModel:keyReleased(key)
+end
