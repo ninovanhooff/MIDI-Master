@@ -44,13 +44,15 @@ function listView:drawCell(section, row, column, selected, x, y, width, height)
     local muteButtonX = x + 16 + gutter*2
     local buttonY = y + 20
 
+    -- solo
     if viewModel:isSolo(row) then
         gfx.fillRoundRect(soloButtonX, buttonY, 16,16, buttonRadius)
     else
         gfx.drawRoundRect(soloButtonX, buttonY, 16,16, buttonRadius)
     end
-    gfx.drawText("s", soloButtonX+3, buttonY)
+    gfx.drawText("s", soloButtonX+5, buttonY)
 
+    -- mute
     if viewModel:isMuted(row) then
         gfx.fillRoundRect(muteButtonX, buttonY, 16,16, buttonRadius)
     else
