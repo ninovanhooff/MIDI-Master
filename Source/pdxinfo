@@ -1,0 +1,6 @@
+name=MIDI Master
+author=Nino van Hooff
+description=A tool for mastering MIDI tracks
+bundleID=com.ninovanhooff.midimaster
+version=1.0
+imagePath=SystemAssets
