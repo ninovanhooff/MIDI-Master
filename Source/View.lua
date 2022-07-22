@@ -60,7 +60,7 @@ function listView:drawCell(section, row, column, selected, x, y, width, height)
 
 
     -- Notes
-    gfx.setClipRect(x+trackControlsWidth, 0, 400-x-trackControlsWidth, 240)
+    gfx.setClipRect(x+trackControlsWidth, listY, 400-x-trackControlsWidth, 240)
 
 
     if viewModel:drawShaded(row) then
@@ -96,14 +96,15 @@ function View:draw()
         listView:scrollToRow(viewModel.selectedIdx)
     end
 
+    -- tracks
+    listView:drawInRect(smallGutter, listY,400 - smallGutter,220)
+
     -- progress
     gfx.drawRect(100, smallGutter, 200, 12)
     gfx.fillRect(
         100 + smallGutter, smallGutter + smallGutter,
         (200 - 2* smallGutter) * viewModel:getProgress(),
         12 - 2 * smallGutter)
-
-    -- tracks
     gfx.drawLine(0, listY - 1,400, listY - 1)
-    listView:drawInRect(smallGutter, listY,400 - smallGutter,220)
+
 end
