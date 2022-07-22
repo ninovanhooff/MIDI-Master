@@ -8,7 +8,9 @@ import "CoreLibs/object"
 import "CoreLibs/ui"
 
 local gfx <const> = playdate.graphics
-local gutter <const> = 2
+local stepWidth <const> = 4
+local smallGutter <const> = 2
+local gutter <const> = 4
 local trackControlsWidth <const> = 150
 local buttonRadius <const> = 2
 local rowHeight <const> = 40
@@ -25,6 +27,7 @@ function View:init(vm)
 end
 
 function listView:drawCell(section, row, column, selected, x, y, width, height)
+    gfx.pushContext()
     if selected then
         gfx.fillRect(x,y,trackControlsWidth,height)
     else
@@ -53,6 +56,27 @@ function listView:drawCell(section, row, column, selected, x, y, width, height)
         gfx.drawRoundRect(muteButtonX, buttonY, 16,16, buttonRadius)
     end
     gfx.drawText("m", muteButtonX + 3, buttonY)
+
+
+    -- Notes
+    gfx.setClipRect(x+trackControlsWidth, 0, 400-x-trackControlsWidth, 240)
+    local stepOffset, noteY
+    local currentStep = viewModel:getCurrentStep()
+    local lastStepOffset = 0
+    local simultaneous = 0
+    for _, item in ipairs(viewModel:getVisibleNotes(row)) do
+        stepOffset = (item.step - currentStep) * stepWidth
+        if stepOffset == lastStepOffset then
+            simultaneous = simultaneous + 1
+        else
+            simultaneous = 0
+        end
+        lastStepOffset = stepOffset
+        noteY = y + gutter + item.velocity*4 + simultaneous * 4
+        gfx.fillRect(x + trackControlsWidth + gutter + stepOffset, noteY, (item.length/ stepWidth),3)
+    end
+
+    gfx.popContext()
 end
 
 function View:draw()
@@ -61,5 +85,14 @@ function View:draw()
         listView:setSelectedRow(viewModel.selectedIdx)
         listView:scrollToRow(viewModel.selectedIdx)
     end
-    listView:drawInRect(0,0,400,240)
+
+    -- progress
+
+    gfx.drawRect(100, gutter, 200, 12)
+    gfx.fillRect(
+        100 + smallGutter, gutter + smallGutter,
+        (200 - 2* smallGutter) * viewModel:getProgress(),
+        12 - 2 * smallGutter)
+
+    listView:drawInRect(0,20,400,220)
 end

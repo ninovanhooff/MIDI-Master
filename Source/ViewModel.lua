@@ -39,6 +39,14 @@ function ViewModel:init(sequence)
     self.selectedIdx = 1
 end
 
+function ViewModel:getCurrentStep()
+    return self.sequence:getCurrentStep()
+end
+
+function ViewModel:getProgress()
+    return self:getCurrentStep() / self.sequence:getLength()
+end
+
 function ViewModel:trackName(idx)
     local synth = self.trackProps[idx].synth
     return string.format("%s : ", idx) .. synthNames[synth]
@@ -46,6 +54,11 @@ end
 
 function ViewModel:getTrack(trackNum)
     return self.sequence:getTrackAtIndex(trackNum)
+end
+
+function ViewModel:getVisibleNotes(trackNum)
+    local startStep = self:getCurrentStep() - 50
+    return self:getTrack(trackNum):getNotes(startStep, startStep + 120)
 end
 
 function ViewModel:isMuted(trackNum)
