@@ -8,6 +8,7 @@ import "CoreLibs/object"
 import "CoreLibs/ui"
 
 local gfx <const> = playdate.graphics
+local tracksY <const> = 18
 local stepWidth <const> = 4
 local smallGutter <const> = 2
 local gutter <const> = 4
@@ -16,7 +17,7 @@ local buttonRadius <const> = 2
 local rowHeight <const> = 40
 local viewModel
 local listView = playdate.ui.gridview.new(0, rowHeight)
-listView:setCellPadding(0, 0, gutter, gutter) -- left, right , top, bottom
+listView:setCellPadding(0, 0, smallGutter, smallGutter) -- left, right , top, bottom
 
 
 class("View").extends()
@@ -29,9 +30,9 @@ end
 function listView:drawCell(section, row, column, selected, x, y, width, height)
     gfx.pushContext()
     if selected then
-        gfx.fillRect(x,y,trackControlsWidth,height)
+        gfx.fillRect(x,y+1,trackControlsWidth,height)
     else
-        gfx.drawRect(x,y,trackControlsWidth,height)
+        gfx.drawRect(x,y+1,trackControlsWidth,height)
     end
 
     gfx.setColor(playdate.graphics.kColorXOR)
@@ -87,12 +88,13 @@ function View:draw()
     end
 
     -- progress
-
-    gfx.drawRect(100, gutter, 200, 12)
+    gfx.drawRect(100, smallGutter, 200, 12)
     gfx.fillRect(
-        100 + smallGutter, gutter + smallGutter,
+        100 + smallGutter, smallGutter + smallGutter,
         (200 - 2* smallGutter) * viewModel:getProgress(),
         12 - 2 * smallGutter)
 
-    listView:drawInRect(0,20,400,220)
+    -- tracks
+    gfx.drawLine(0,tracksY - 1,400,tracksY - 1)
+    listView:drawInRect(0,tracksY,400,220)
 end
