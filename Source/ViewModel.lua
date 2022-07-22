@@ -25,7 +25,9 @@ function ViewModel:init(midiPath)
     print("Sequence tempo", self.sequence:getTempo())
     self.numTracks = self.sequence:getTrackCount()
     self.trackProps = {}
+    self.activeNoteCache = {}
     for i = 1, self.numTracks do
+        self.activeNoteCache[i] = {}
         local synth
         if i == 10 then
             synth = "drums"
@@ -39,6 +41,7 @@ function ViewModel:init(midiPath)
         }
     end
     self.selectedIdx = 1
+    self.activeNoteCache = {}
     self.sequence:play()
 end
 
@@ -60,8 +63,9 @@ function ViewModel:getTrack(trackNum)
 end
 
 function ViewModel:getVisibleNotes(trackNum)
-    local startStep = self:getCurrentStep() - 50
-    return self:getTrack(trackNum):getNotes(startStep, startStep + 120)
+    -- todo use noteCache, or simply read all notes up front?
+    local startStep = self:getCurrentStep() - 280
+    return self:getTrack(trackNum):getNotes(startStep, startStep + 480)
 end
 
 function ViewModel:isMuted(trackNum)

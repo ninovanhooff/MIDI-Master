@@ -9,7 +9,7 @@ import "CoreLibs/ui"
 
 local gfx <const> = playdate.graphics
 local listY <const> = 18
-local stepWidth <const> = 4
+local stepWidth <const> = 2
 local smallGutter <const> = 2
 local gutter <const> = 4
 local trackControlsWidth <const> = 150
