@@ -6,17 +6,17 @@
 
 local snd <const> = playdate.sound
 
---synths = {
---    snd.kWaveSine,
---    snd.kWaveSquare,
---    snd.kWaveSawtooth,
---    snd.kWaveTriangle,
---    snd.kWaveNoise,
---    snd.kWavePOPhase,
---    snd.kWavePODigital,
---    snd.kWavePOVosim,
---    "drums"
---}
+synths = {
+    snd.kWaveSine,
+    snd.kWaveSquare,
+    snd.kWaveSawtooth,
+    snd.kWaveTriangle,
+    snd.kWaveNoise,
+    snd.kWavePOPhase,
+    snd.kWavePODigital,
+    snd.kWavePOVosim,
+    "drums"
+}
 
 synthNames = {
     [snd.kWaveSine] = "Sine",

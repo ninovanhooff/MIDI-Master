@@ -6,8 +6,9 @@
 
 local snd <const> = playdate.sound
 
-function newsynth()
-    local s = snd.synth.new(snd.kWaveSawtooth)
+function newWaveSynth(wave)
+    print("wave", wave, wave == snd.kWaveSawtooth)
+    local s = snd.synth.new(wave or snd.kWaveSawtooth)
     s:setVolume(0.2)
     s:setAttack(0)
     s:setDecay(0.15)
@@ -16,40 +17,41 @@ function newsynth()
     return s
 end
 
-function drumsynth(path)
-    local sample = snd.sample.new(path)
+function createSampleSynth(samplePath)
+    local sample = snd.sample.new(samplePath)
     local s = snd.synth.new(sample)
     s:setVolume(0.5)
     return s
 end
 
-function newinst(n)
+function createWaveInstrument(polyphony, wave)
+    print("create wave inst", polyphony)
     local inst = snd.instrument.new()
-    for _=1,n do
-        inst:addVoice(newsynth())
+    for _=1, polyphony do
+        inst:addVoice(newWaveSynth(wave))
     end
     return inst
 end
 
-function druminst()
+function createDrumInstrument()
     local inst = snd.instrument.new()
-    inst:addVoice(drumsynth("drums/kick"), 35)
-    inst:addVoice(drumsynth("drums/kick"), 36)
-    inst:addVoice(drumsynth("drums/snare"), 38)
-    inst:addVoice(drumsynth("drums/clap"), 39)
-    inst:addVoice(drumsynth("drums/tom-low"), 41)
-    inst:addVoice(drumsynth("drums/tom-low"), 43)
-    inst:addVoice(drumsynth("drums/tom-mid"), 45)
-    inst:addVoice(drumsynth("drums/tom-mid"), 47)
-    inst:addVoice(drumsynth("drums/tom-hi"), 48)
-    inst:addVoice(drumsynth("drums/tom-hi"), 50)
-    inst:addVoice(drumsynth("drums/hh-closed"), 42)
-    inst:addVoice(drumsynth("drums/hh-closed"), 44)
-    inst:addVoice(drumsynth("drums/hh-open"), 46)
-    inst:addVoice(drumsynth("drums/cymbal-crash"), 49)
-    inst:addVoice(drumsynth("drums/cymbal-ride"), 51)
-    inst:addVoice(drumsynth("drums/cowbell"), 56)
-    inst:addVoice(drumsynth("drums/clav"), 75)
+    inst:addVoice(createSampleSynth("drums/kick"), 35)
+    inst:addVoice(createSampleSynth("drums/kick"), 36)
+    inst:addVoice(createSampleSynth("drums/snare"), 38)
+    inst:addVoice(createSampleSynth("drums/clap"), 39)
+    inst:addVoice(createSampleSynth("drums/tom-low"), 41)
+    inst:addVoice(createSampleSynth("drums/tom-low"), 43)
+    inst:addVoice(createSampleSynth("drums/tom-mid"), 45)
+    inst:addVoice(createSampleSynth("drums/tom-mid"), 47)
+    inst:addVoice(createSampleSynth("drums/tom-hi"), 48)
+    inst:addVoice(createSampleSynth("drums/tom-hi"), 50)
+    inst:addVoice(createSampleSynth("drums/hh-closed"), 42)
+    inst:addVoice(createSampleSynth("drums/hh-closed"), 44)
+    inst:addVoice(createSampleSynth("drums/hh-open"), 46)
+    inst:addVoice(createSampleSynth("drums/cymbal-crash"), 49)
+    inst:addVoice(createSampleSynth("drums/cymbal-ride"), 51)
+    inst:addVoice(createSampleSynth("drums/cowbell"), 56)
+    inst:addVoice(createSampleSynth("drums/clav"), 75)
     return inst
 end
 
@@ -62,19 +64,20 @@ function loadMidi(path)
     for i=1,ntracks do
         local track = s:getTrackAtIndex(i)
         if track ~= nil then
-            local n = track:getPolyphony(i)
-            if n > 0 then active[#active+1] = i end
-            if n > poly then poly = n end
-            print("track "..i.." has polyphony "..n)
+            local polyphony = track:getPolyphony(i)
+            if polyphony > 0 then active[#active+1] = i end
+            if polyphony > poly then poly = polyphony
+            end
+            print("track "..i.." has polyphony ".. polyphony)
 
             print("default instrument for track", i, track:getInstrument())
 
             if i == 10 then
                 print("Creating Drums for track", i)
-                track:setInstrument(druminst(n))
+                track:setInstrument(createDrumInstrument(polyphony))
             else
                 print("Creating Sawtooth for track", i)
-                track:setInstrument(newinst(n))
+                track:setInstrument(createWaveInstrument(polyphony))
             end
         end
     end

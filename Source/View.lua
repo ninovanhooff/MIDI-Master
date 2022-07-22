@@ -8,16 +8,16 @@ import "CoreLibs/object"
 import "CoreLibs/ui"
 
 local gfx <const> = playdate.graphics
-local tracksY <const> = 18
+local listY <const> = 18
 local stepWidth <const> = 4
 local smallGutter <const> = 2
 local gutter <const> = 4
 local trackControlsWidth <const> = 150
 local buttonRadius <const> = 2
-local rowHeight <const> = 40
+local rowHeight <const> = 38
 local viewModel
 local listView = playdate.ui.gridview.new(0, rowHeight)
-listView:setCellPadding(0, 0, smallGutter, smallGutter) -- left, right , top, bottom
+listView:setCellPadding(0, 0, 0, smallGutter) -- left, right , top, bottom
 
 
 class("View").extends()
@@ -61,6 +61,15 @@ function listView:drawCell(section, row, column, selected, x, y, width, height)
 
     -- Notes
     gfx.setClipRect(x+trackControlsWidth, 0, 400-x-trackControlsWidth, 240)
+
+
+    if viewModel:drawShaded(row) then
+        gfx.pushContext()
+        gfx.setDitherPattern(0.8, gfx.image.kDitherTypeDiagonalLine) -- invert alpha due to bug in SDK
+        gfx.fillRect(trackControlsWidth, y+1, width - trackControlsWidth, height)
+        gfx.popContext()
+    end
+
     local stepOffset, noteY
     local currentStep = viewModel:getCurrentStep()
     local lastStepOffset = 0
@@ -95,6 +104,6 @@ function View:draw()
         12 - 2 * smallGutter)
 
     -- tracks
-    gfx.drawLine(0,tracksY - 1,400,tracksY - 1)
-    listView:drawInRect(0,tracksY,400,220)
+    gfx.drawLine(0, listY - 1,400, listY - 1)
+    listView:drawInRect(smallGutter, listY,400 - smallGutter,220)
 end

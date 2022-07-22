@@ -65,6 +65,21 @@ function ViewModel:isMuted(trackNum)
     return self.trackProps[trackNum].isMuted
 end
 
+--- when the track is silent, because it is muted or another track is solo
+function ViewModel:drawShaded(trackNum)
+    if self:isMuted(trackNum) then
+        return true
+    end
+
+    for i = 1, self.numTracks do
+        if self:isSolo(i) and i ~= trackNum then
+            return true
+        end
+    end
+
+    return false
+end
+
 function ViewModel:setMuted(trackNum, muted)
     self.trackProps[trackNum].isMuted = muted
     local track = self:getTrack(trackNum)
@@ -95,6 +110,26 @@ function ViewModel:toggleSolo(trackNum)
     end
 end
 
+function ViewModel:toggleInstrument(trackNum)
+    self.sequence:stop()
+    local curSynth = self.trackProps[trackNum].synth
+    local nextIndex = lume.find(synths, curSynth) + 1
+    if nextIndex > #synths then
+        nextIndex = 1
+    end
+    local nextSynth = synths[nextIndex]
+    local polyphony = self:getTrack(trackNum):getPolyphony()
+    local newInstrument
+    if nextSynth == "drums" then
+        newInstrument = createDrumInstrument()
+    else
+        newInstrument = createWaveInstrument(polyphony,nextSynth)
+    end
+    self:getTrack(trackNum):setInstrument(newInstrument)
+    self.trackProps[trackNum].synth = nextSynth
+    self.sequence:play()
+end
+
 function ViewModel:update()
     if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
         self.selectedIdx = self.selectedIdx + 1
@@ -108,5 +143,7 @@ function ViewModel:keyReleased(key)
         self:toggleMuted(self.selectedIdx)
     elseif key == "n" then
         self:toggleSolo(self.selectedIdx)
+    elseif key == "i" then
+        self:toggleInstrument(self.selectedIdx)
     end
 end
