@@ -9,6 +9,7 @@ import "CoreLibs/ui"
 
 local gfx <const> = playdate.graphics
 local gutter <const> = 2
+local trackControlsWidth <const> = 150
 local buttonRadius <const> = 2
 local rowHeight <const> = 40
 local viewModel
@@ -25,9 +26,9 @@ end
 
 function listView:drawCell(section, row, column, selected, x, y, width, height)
     if selected then
-        gfx.fillRect(x,y,width,height)
+        gfx.fillRect(x,y,trackControlsWidth,height)
     else
-        gfx.drawRect(x,y,width,height)
+        gfx.drawRect(x,y,trackControlsWidth,height)
     end
 
     gfx.setColor(playdate.graphics.kColorXOR)
@@ -35,13 +36,23 @@ function listView:drawCell(section, row, column, selected, x, y, width, height)
 
     gfx.drawText(viewModel:trackName(row), x + gutter, y + gutter)
 
+    local soloButtonX = x+gutter
+    local muteButtonX = x + 16 + gutter*2
     local buttonY = y + 20
-    if viewModel.trackProps[row].isMuted then
-        gfx.fillRoundRect(x+gutter, buttonY, 16,16, buttonRadius)
+
+    if viewModel:isSolo(row) then
+        gfx.fillRoundRect(soloButtonX, buttonY, 16,16, buttonRadius)
     else
-        gfx.drawRoundRect(x+gutter, buttonY, 16,16, buttonRadius)
+        gfx.drawRoundRect(soloButtonX, buttonY, 16,16, buttonRadius)
     end
-    gfx.drawText("m", x+ gutter+3, buttonY)
+    gfx.drawText("s", soloButtonX+3, buttonY)
+
+    if viewModel:isMuted(row) then
+        gfx.fillRoundRect(muteButtonX, buttonY, 16,16, buttonRadius)
+    else
+        gfx.drawRoundRect(muteButtonX, buttonY, 16,16, buttonRadius)
+    end
+    gfx.drawText("m", muteButtonX + 3, buttonY)
 end
 
 function View:draw()

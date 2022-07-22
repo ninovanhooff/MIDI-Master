@@ -32,6 +32,7 @@ function ViewModel:init(sequence)
         end
         self.trackProps[i] = {
             isMuted = false,
+            isSolo = false,
             synth = synth
         }
     end
@@ -53,12 +54,32 @@ end
 
 function ViewModel:setMuted(trackNum, muted)
     self.trackProps[trackNum].isMuted = muted
-    self:getTrack(trackNum):setMuted(muted)
+    local track = self:getTrack(trackNum)
+    track:setMuted(muted)
+    track:getInstrument():allNotesOff()
 end
 
 function ViewModel:toggleMuted(trackNum)
     local isMuted = self:isMuted(trackNum)
     self:setMuted(trackNum, not isMuted)
+end
+
+function ViewModel:isSolo(trackNum)
+    return self.trackProps[trackNum].isSolo
+end
+
+function ViewModel:toggleSolo(trackNum)
+    local newIsSolo = not self:isSolo(trackNum)
+    for i, item in ipairs(self.trackProps) do
+        item.isSolo = i == trackNum and newIsSolo
+        local track = self:getTrack(i)
+        local muteTrack = item.isMuted or (newIsSolo and i ~= trackNum)
+        track:setMuted(muteTrack)
+        if muteTrack then
+            track:getInstrument():allNotesOff()
+        end
+        print("set solo for ", i, item.isSolo, "muted", item.isMuted or (newIsSolo and i ~= trackNum))
+    end
 end
 
 function ViewModel:update()
@@ -72,5 +93,7 @@ end
 function ViewModel:keyReleased(key)
     if key == "m" then
         self:toggleMuted(self.selectedIdx)
+    elseif key == "n" then
+        self:toggleSolo(self.selectedIdx)
     end
 end
