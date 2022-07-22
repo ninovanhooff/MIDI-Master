@@ -114,7 +114,6 @@ function ViewModel:toggleSolo(trackNum)
 end
 
 function ViewModel:toggleInstrument(trackNum)
-    self.sequence:stop()
     local curSynth = self.trackProps[trackNum].synth
     local nextIndex = lume.find(synths, curSynth) + 1
     if nextIndex > #synths then
@@ -130,6 +129,7 @@ function ViewModel:toggleInstrument(trackNum)
     end
     self:getTrack(trackNum):setInstrument(newInstrument)
     self.trackProps[trackNum].synth = nextSynth
+    -- calling play again will apply the changes to the running sequence
     self.sequence:play()
 end
 
