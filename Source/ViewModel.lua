@@ -19,8 +19,9 @@ local buttonUp <const> = playdate.kButtonUp
 
 class("ViewModel").extends()
 
-function ViewModel:init(midiPath)
-    self.sequence, self.trackProps = loadMidi(midiPath)
+function ViewModel:init(songName)
+    self.currentSongName = songName
+    self.sequence, self.trackProps = loadMidi("songs/" .. songName)
 
     print("Sequence length (steps)", self.sequence:getLength())
     print("Sequence tempo", self.sequence:getTempo())
@@ -117,11 +118,7 @@ end
 function ViewModel:toggleInstrument(trackNum)
     local props = self.trackProps[trackNum]
     local curSynth = props.synth
-    local nextIndex = lume.find(synths, curSynth) + 1
-    if nextIndex > #synths then
-        nextIndex = 1
-    end
-    props.synth = synths[nextIndex]
+    props.synth = selectNext(synths, curSynth)
     local polyphony = self:getTrack(trackNum):getPolyphony()
     local newInstrument = createInstrument(polyphony, props)
     self:getTrack(trackNum):setInstrument(newInstrument)
@@ -157,6 +154,10 @@ function ViewModel:update()
     elseif justPressed(buttonUp) and self.selectedIdx > 1 then
         self.selectedIdx = self.selectedIdx - 1
     end
+end
+
+function ViewModel:destroy()
+    self.sequence:stop()
 end
 
 function ViewModel:keyReleased(key)

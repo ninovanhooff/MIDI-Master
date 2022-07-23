@@ -9,7 +9,6 @@ import "CoreLibs/ui"
 import "CoreLibs/graphics"
 
 local gfx <const> = playdate.graphics
-local noFlip <const> = gfx.kImageUnflipped
 local lume <const> = lume
 local screenW <const> = playdate.display.getWidth()
 local floor <const> = math.floor
@@ -31,6 +30,11 @@ function View:init(vm)
     trackStrips = {}
     viewModel = vm
     local numTracks = vm.numTracks
+    if vm.numTracks == 0 then
+        self.error = "Number of tracks is 0. Was the filename spelled correctly?"
+        return
+    end
+
     local numSteps = vm:getNumSteps()
     local stepsPerPixel = lume.clamp(
         numSteps / screenW,
@@ -134,6 +138,15 @@ end
 
 function View:draw()
     gfx.clear(gfx.kColorWhite)
+
+    -- draw filename without escapes
+    gfx.getFont():drawText(viewModel.currentSongName, 2,2)
+
+    if self.error then
+        gfx.drawText(self.error, 50,100)
+        return
+    end
+
     if listView:getSelectedRow() ~= viewModel.selectedIdx then
         listView:setSelectedRow(viewModel.selectedIdx)
         listView:scrollToRow(viewModel.selectedIdx)
@@ -143,10 +156,12 @@ function View:draw()
     listView:drawInRect(smallGutter, listY,screenW - smallGutter,220)
 
     -- progress
-    gfx.drawRect(100, smallGutter, 200, 12)
+    local progressBarWidth <const> = 100
+    local progressBarX <const> = screenW - progressBarWidth - smallGutter
+    gfx.drawRect(progressBarX, smallGutter, progressBarWidth, 12)
     gfx.fillRect(
-        100 + smallGutter, smallGutter + smallGutter,
-        (200 - 2* smallGutter) * viewModel:getProgress(),
+        progressBarX + smallGutter, smallGutter + smallGutter,
+        (progressBarWidth - 2* smallGutter) * viewModel:getProgress(),
         12 - 2 * smallGutter)
     gfx.drawLine(0, listY - 1,screenW, listY - 1)
 
