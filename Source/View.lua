@@ -9,8 +9,11 @@ import "CoreLibs/ui"
 import "CoreLibs/graphics"
 
 local gfx <const> = playdate.graphics
+local noFlip <const> = gfx.kImageUnflipped
+local lume <const> = lume
+local screenW <const> = playdate.display.getWidth()
+local floor <const> = math.floor
 local listY <const> = 18
-local stepWidth <const> = 2
 local smallGutter <const> = 2
 local gutter <const> = 4
 local trackControlsWidth <const> = 150
@@ -18,14 +21,37 @@ local buttonRadius <const> = 2
 local rowHeight <const> = 38
 local viewModel
 local listView = playdate.ui.gridview.new(0, rowHeight)
+local trackStrips, stripWidth
 listView:setCellPadding(0, 0, 0, smallGutter) -- left, right , top, bottom
 
 
 class("View").extends()
 
 function View:init(vm)
+    trackStrips = {}
     viewModel = vm
-    listView:setNumberOfRows(vm.numTracks)
+    local numTracks = vm.numTracks
+    local numSteps = vm:getNumSteps()
+    local stepsPerPixel = lume.clamp(
+        numSteps / screenW,
+        1, 4
+    )
+    stripWidth = numSteps / stepsPerPixel
+    print("steps per pixel", stepsPerPixel, "stripWidth", stripWidth)
+    listView:setNumberOfRows(numTracks)
+    for i = 1, numTracks do
+        local curStrip = gfx.image.new(stripWidth, rowHeight)
+        gfx.pushContext(curStrip)
+        trackStrips[i] = curStrip
+
+        local notes = vm:getNotes(i)
+        for _, note in ipairs(notes) do
+            for curStep = note.step, note.step + note.length do
+                gfx.drawPixel(floor(curStep/stepsPerPixel), (note.note / 127) * rowHeight)
+            end
+        end
+        gfx.popContext()
+    end
 end
 
 function listView:drawCell(_, row, _, selected, x, y, width, height)
@@ -82,7 +108,7 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.setLineWidth(1)
 
     -- Notes
-    gfx.setClipRect(x+trackControlsWidth, listY, 400-x-trackControlsWidth, 240)
+    gfx.setClipRect(x+trackControlsWidth, listY, screenW-x-trackControlsWidth, 240)
 
 
     if viewModel:drawShaded(row) then
@@ -92,21 +118,10 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
         gfx.popContext()
     end
 
-    local stepOffset, noteY
-    local currentStep = viewModel:getCurrentStep()
-    local lastStepOffset = 0
-    local simultaneous = 0
-    for _, item in ipairs(viewModel:getVisibleNotes(row)) do
-        stepOffset = (item.step - currentStep) * stepWidth
-        if stepOffset == lastStepOffset then
-            simultaneous = simultaneous + 1
-        else
-            simultaneous = 0
-        end
-        lastStepOffset = stepOffset
-        noteY = y + gutter + item.velocity*4 + simultaneous * 4
-        gfx.fillRect(x + trackControlsWidth + gutter + stepOffset, noteY, (item.length/ stepWidth),3)
-    end
+        trackStrips[row]:draw(
+            trackControlsWidth - (viewModel:getProgress() * stripWidth),
+            y
+        )
 
     gfx.popContext()
 end
@@ -125,7 +140,7 @@ function View:draw()
     end
 
     -- tracks
-    listView:drawInRect(smallGutter, listY,400 - smallGutter,220)
+    listView:drawInRect(smallGutter, listY,screenW - smallGutter,220)
 
     -- progress
     gfx.drawRect(100, smallGutter, 200, 12)
@@ -133,6 +148,6 @@ function View:draw()
         100 + smallGutter, smallGutter + smallGutter,
         (200 - 2* smallGutter) * viewModel:getProgress(),
         12 - 2 * smallGutter)
-    gfx.drawLine(0, listY - 1,400, listY - 1)
+    gfx.drawLine(0, listY - 1,screenW, listY - 1)
 
 end

@@ -40,6 +40,10 @@ function ViewModel:init(midiPath)
     self.sequence:play()
 end
 
+function ViewModel:getNumSteps()
+    return self.sequence:getLength()
+end
+
 function ViewModel:getCurrentStep()
     return self.sequence:getCurrentStep()
 end
@@ -57,10 +61,8 @@ function ViewModel:getTrack(trackNum)
     return self.sequence:getTrackAtIndex(trackNum)
 end
 
-function ViewModel:getVisibleNotes(trackNum)
-    -- todo use noteCache, or simply read all notes up front?
-    local startStep = self:getCurrentStep() - 280
-    return self:getTrack(trackNum):getNotes(startStep, startStep + 480)
+function ViewModel:getNotes(trackNum)
+    return self:getTrack(trackNum):getNotes(1, self:getNumSteps())
 end
 
 function ViewModel:isMuted(trackNum)
