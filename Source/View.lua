@@ -42,6 +42,10 @@ function View:init(vm)
         numSteps / screenW,
         1, 4
     )
+    if numSteps / stepsPerPixel > 4000 then
+        -- this would be too wide for comfort, bitmap size is limiting factor
+        stepsPerPixel = numSteps / 4000
+    end
     stripWidth = numSteps / stepsPerPixel
     print("steps per pixel", stepsPerPixel, "stripWidth", stripWidth)
     listView:setNumberOfRows(numTracks)
@@ -117,7 +121,7 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.setClipRect(x+trackControlsWidth, listY, screenW-x-trackControlsWidth, 240)
 
 
-    if viewModel:drawShaded(row) then
+    if viewModel:isSilenced(row) then
         gfx.pushContext()
         gfx.setDitherPattern(0.8, gfx.image.kDitherTypeDiagonalLine) -- invert alpha due to bug in SDK
         gfx.fillRect(trackControlsWidth, y+1, width - trackControlsWidth, height)

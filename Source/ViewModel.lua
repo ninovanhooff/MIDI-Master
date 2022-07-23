@@ -8,6 +8,8 @@ import "CoreLibs/object"
 
 local snd <const> = playdate.sound
 
+local floor <const> = math.floor
+local getCrankChange <const> = playdate.getCrankChange
 local justPressed <const> = playdate.buttonJustPressed
 -- local justReleased <const> = playdate.buttonJustReleased
 local buttonDown <const> = playdate.kButtonDown
@@ -37,6 +39,8 @@ function ViewModel:init(songPath)
         end
     end
     self.selectedIdx = 1
+    self:applyMuteAndSolo()
+    self.crankSpeed = self.sequence:getTempo() / 4
     self.sequence:play()
 end
 
@@ -70,30 +74,35 @@ function ViewModel:isMuted(trackNum)
 end
 
 --- when the track is silent, because it is muted or another track is solo
-function ViewModel:drawShaded(trackNum)
-    if self:isMuted(trackNum) then
-        return true
-    end
-
-    for i = 1, self.numTracks do
-        if self:isSolo(i) and i ~= trackNum then
-            return true
+function ViewModel:isSilenced(trackNum)
+    local anySolo = false
+    for _,item in ipairs(self.trackProps) do
+        if item.isSolo then
+            anySolo = true
+            break
         end
     end
 
-    return false
+    local props = self.trackProps[trackNum]
+    return props.isMuted or (anySolo and not props.isSolo)
 end
 
-function ViewModel:setMuted(trackNum, muted)
-    self.trackProps[trackNum].isMuted = muted
-    local track = self:getTrack(trackNum)
-    track:setMuted(muted)
-    track:getInstrument():allNotesOff()
+function ViewModel:applyMuteAndSolo()
+    for i = 1, #self.trackProps do
+        local track = self:getTrack(i)
+        local muteTrack = self:isSilenced(i)
+        track:setMuted(muteTrack)
+        if muteTrack then
+            track:getInstrument():allNotesOff()
+        end
+        print("set track silenced for ",i, muteTrack)
+    end
 end
 
 function ViewModel:toggleMuted(trackNum)
     local isMuted = self:isMuted(trackNum)
-    self:setMuted(trackNum, not isMuted)
+    self.trackProps[trackNum].isMuted = not isMuted
+    self:applyMuteAndSolo()
 end
 
 function ViewModel:isSolo(trackNum)
@@ -101,17 +110,8 @@ function ViewModel:isSolo(trackNum)
 end
 
 function ViewModel:toggleSolo(trackNum)
-    local newIsSolo = not self:isSolo(trackNum)
-    for i, item in ipairs(self.trackProps) do
-        item.isSolo = i == trackNum and newIsSolo
-        local track = self:getTrack(i)
-        local muteTrack = item.isMuted or (newIsSolo and i ~= trackNum)
-        track:setMuted(muteTrack)
-        if muteTrack then
-            track:getInstrument():allNotesOff()
-        end
-        print("set solo for ", i, item.isSolo, "muted", item.isMuted or (newIsSolo and i ~= trackNum))
-    end
+    self.trackProps[trackNum].isSolo = not self:isSolo(trackNum)
+    self:applyMuteAndSolo()
 end
 
 function ViewModel:toggleInstrument(trackNum)
@@ -147,11 +147,21 @@ function ViewModel:changeTrackProp(trackNum, key, amount)
     self.sequence:play()
 end
 
+function ViewModel:movePlayHead(change)
+    print(change)
+    self.sequence:goToStep(self:getCurrentStep() + floor(change * self.crankSpeed), true)
+end
+
 function ViewModel:update()
     if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
         self.selectedIdx = self.selectedIdx + 1
     elseif justPressed(buttonUp) and self.selectedIdx > 1 then
         self.selectedIdx = self.selectedIdx - 1
+    end
+
+    local _, accChange = getCrankChange()
+    if accChange ~= 0 then
+        self:movePlayHead(accChange)
     end
 end
 
