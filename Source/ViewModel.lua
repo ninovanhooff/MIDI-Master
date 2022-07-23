@@ -20,11 +20,11 @@ local buttonUp <const> = playdate.kButtonUp
 class("ViewModel").extends()
 
 function ViewModel:init(midiPath)
-    self.sequence = loadMidi(midiPath)
+    self.sequence, self.trackProps = loadMidi(midiPath)
+
     print("Sequence length (steps)", self.sequence:getLength())
     print("Sequence tempo", self.sequence:getTempo())
     self.numTracks = self.sequence:getTrackCount()
-    self.trackProps = {}
     self.activeNoteCache = {}
     for i = 1, self.numTracks do
         self.activeNoteCache[i] = {}
@@ -34,11 +34,6 @@ function ViewModel:init(midiPath)
         else
             synth = snd.kWaveSawtooth
         end
-        self.trackProps[i] = {
-            isMuted = false,
-            isSolo = false,
-            synth = synth
-        }
     end
     self.selectedIdx = 1
     self.activeNoteCache = {}
@@ -125,15 +120,32 @@ function ViewModel:toggleInstrument(trackNum)
     end
     local nextSynth = synths[nextIndex]
     local polyphony = self:getTrack(trackNum):getPolyphony()
-    local newInstrument
-    if nextSynth == "drums" then
-        newInstrument = createDrumInstrument()
-    else
-        newInstrument = createWaveInstrument(polyphony,nextSynth)
-    end
+    local newInstrument = createInstrument(polyphony, trackProps)
     self:getTrack(trackNum):setInstrument(newInstrument)
     self.trackProps[trackNum].synth = nextSynth
     -- calling play again will apply the changes to the running sequence
+    self.sequence:play()
+end
+
+function ViewModel:getADSR(trackNum)
+    local props = self.trackProps[trackNum]
+    return
+        props.attack,
+        props.decay,
+        props.sustain,
+        props.release
+end
+
+function ViewModel:increaseAttack(trackNum, amount)
+    local trackProps = self.trackProps[trackNum]
+    local track = self:getTrack(trackNum)
+    trackProps.attack = lume.clamp(
+        self.trackProps[trackNum].attack + amount,
+        0, 1
+    )
+    track:setInstrument(createInstrument(
+        track:getPolyphony(), trackProps
+    ))
     self.sequence:play()
 end
 
@@ -146,11 +158,16 @@ function ViewModel:update()
 end
 
 function ViewModel:keyReleased(key)
+    local trackNum = self.selectedIdx
     if key == "m" then
-        self:toggleMuted(self.selectedIdx)
+        self:toggleMuted(trackNum)
     elseif key == "n" then
-        self:toggleSolo(self.selectedIdx)
+        self:toggleSolo(trackNum)
     elseif key == "i" then
-        self:toggleInstrument(self.selectedIdx)
+        self:toggleInstrument(trackNum)
+    elseif key == "r" then
+        self:increaseAttack(trackNum, 0.1)
+    elseif key == "f" then
+        self:increaseAttack(trackNum, -0.1)
     end
 end

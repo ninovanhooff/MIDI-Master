@@ -6,6 +6,7 @@
 
 import "CoreLibs/object"
 import "CoreLibs/ui"
+import "CoreLibs/graphics"
 
 local gfx <const> = playdate.graphics
 local listY <const> = 18
@@ -27,7 +28,7 @@ function View:init(vm)
     listView:setNumberOfRows(vm.numTracks)
 end
 
-function listView:drawCell(section, row, column, selected, x, y, width, height)
+function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.pushContext()
     if selected then
         gfx.fillRect(x,y+1,trackControlsWidth,height)
@@ -60,6 +61,25 @@ function listView:drawCell(section, row, column, selected, x, y, width, height)
     end
     gfx.drawText("m", muteButtonX + 3, buttonY)
 
+    gfx.setLineWidth(2)
+    local potY = y + 30
+    local potSpacing = 22
+    local attack, decay, sustain, release = viewModel:getADSR(row)
+    -- attack
+    local attackX = muteButtonX + 40
+    drawPot("a", attackX, potY, attack)
+    -- decay
+    local decayX = attackX + potSpacing
+    drawPot("d", decayX, potY, decay)
+    -- sustain
+    local sustainX = decayX + potSpacing
+    drawPot("s", sustainX, potY, sustain)
+    -- release
+    local releaseX = sustainX + potSpacing
+    drawPot("r", releaseX, potY, release)
+
+
+    gfx.setLineWidth(1)
 
     -- Notes
     gfx.setClipRect(x+trackControlsWidth, listY, 400-x-trackControlsWidth, 240)
@@ -89,6 +109,12 @@ function listView:drawCell(section, row, column, selected, x, y, width, height)
     end
 
     gfx.popContext()
+end
+
+function drawPot(text, x, y, value)
+    value = lume.clamp(value, 0.1, 1.0)
+    gfx.drawArc(x, y, 8, 225, 225 + (value*270))
+    gfx.drawText(text, x-4, y-8)
 end
 
 function View:draw()
