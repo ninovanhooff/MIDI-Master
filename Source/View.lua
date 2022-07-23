@@ -18,6 +18,8 @@ local gutter <const> = 4
 local trackControlsWidth <const> = 150
 local buttonRadius <const> = 2
 local rowHeight <const> = 38
+local progressBarWidth <const> = 100
+local progressBarX <const> = screenW - progressBarWidth - smallGutter
 local viewModel
 local listView = playdate.ui.gridview.new(0, rowHeight)
 local trackStrips, stripWidth
@@ -156,8 +158,6 @@ function View:draw()
     listView:drawInRect(smallGutter, listY,screenW - smallGutter,220)
 
     -- progress
-    local progressBarWidth <const> = 100
-    local progressBarX <const> = screenW - progressBarWidth - smallGutter
     gfx.drawRect(progressBarX, smallGutter, progressBarWidth, 12)
     gfx.fillRect(
         progressBarX + smallGutter, smallGutter + smallGutter,
