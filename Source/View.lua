@@ -112,7 +112,7 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
 end
 
 function drawPot(text, x, y, value)
-    value = lume.clamp(value, 0.1, 1.0)
+    value = lume.clamp(value, 0.03, 1.0)
     gfx.drawArc(x, y, 8, 225, 225 + (value*270))
     gfx.drawText(text, x-4, y-8)
 end
