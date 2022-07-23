@@ -113,16 +113,16 @@ function ViewModel:toggleSolo(trackNum)
 end
 
 function ViewModel:toggleInstrument(trackNum)
-    local curSynth = self.trackProps[trackNum].synth
+    local props = self.trackProps[trackNum]
+    local curSynth = props.synth
     local nextIndex = lume.find(synths, curSynth) + 1
     if nextIndex > #synths then
         nextIndex = 1
     end
-    local nextSynth = synths[nextIndex]
+    props.synth = synths[nextIndex]
     local polyphony = self:getTrack(trackNum):getPolyphony()
-    local newInstrument = createInstrument(polyphony, trackProps)
+    local newInstrument = createInstrument(polyphony, props)
     self:getTrack(trackNum):setInstrument(newInstrument)
-    self.trackProps[trackNum].synth = nextSynth
     -- calling play again will apply the changes to the running sequence
     self.sequence:play()
 end
@@ -136,11 +136,11 @@ function ViewModel:getADSR(trackNum)
         props.release
 end
 
-function ViewModel:increaseAttack(trackNum, amount)
+function ViewModel:changeTrackProp(trackNum, key, amount)
     local trackProps = self.trackProps[trackNum]
     local track = self:getTrack(trackNum)
-    trackProps.attack = lume.clamp(
-        self.trackProps[trackNum].attack + amount,
+    trackProps[key] = lume.clamp(
+        trackProps[key] + amount,
         0, 1
     )
     track:setInstrument(createInstrument(
@@ -166,8 +166,20 @@ function ViewModel:keyReleased(key)
     elseif key == "i" then
         self:toggleInstrument(trackNum)
     elseif key == "r" then
-        self:increaseAttack(trackNum, 0.1)
+        self:changeTrackProp(trackNum, "attack", 0.1)
     elseif key == "f" then
-        self:increaseAttack(trackNum, -0.1)
+        self:changeTrackProp(trackNum, "attack", -0.1)
+    elseif key == "t" then
+        self:changeTrackProp(trackNum, "decay",0.1)
+    elseif key == "g" then
+        self:changeTrackProp(trackNum, "decay", -0.1)
+    elseif key == "y" then
+        self:changeTrackProp(trackNum, "sustain", 0.1)
+    elseif key == "h" then
+        self:changeTrackProp(trackNum, "sustain", -0.1)
+    elseif key == "u" then
+        self:changeTrackProp(trackNum, "release", 0.1)
+    elseif key == "j" then
+        self:changeTrackProp(trackNum, "release", -0.1)
     end
 end
