@@ -142,7 +142,7 @@ function View:draw()
     gfx.clear(gfx.kColorWhite)
 
     -- draw filename without escapes
-    gfx.getFont():drawText(viewModel.currentSongName, 2,2)
+    gfx.getFont():drawText(viewModel.currentSongPath, 2,2)
 
     if self.error then
         gfx.drawText(self.error, 50,100)

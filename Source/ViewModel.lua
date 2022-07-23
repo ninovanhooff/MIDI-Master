@@ -19,16 +19,16 @@ local buttonUp <const> = playdate.kButtonUp
 
 class("ViewModel").extends()
 
-function ViewModel:init(songName)
-    self.currentSongName = songName
-    self.sequence, self.trackProps = loadMidi("songs/" .. songName)
+function ViewModel:init(songPath)
+    self.currentSongPath = songPath
+    self.trackProps = playdate.datastore.read(self.currentSongPath)
+    print(songPath, trackProps)
+    self.sequence, self.trackProps = loadMidi(songPath, self.trackProps)
 
     print("Sequence length (steps)", self.sequence:getLength())
     print("Sequence tempo", self.sequence:getTempo())
     self.numTracks = self.sequence:getTrackCount()
-    self.activeNoteCache = {}
     for i = 1, self.numTracks do
-        self.activeNoteCache[i] = {}
         local synth
         if i == 10 then
             synth = "drums"
@@ -37,7 +37,6 @@ function ViewModel:init(songName)
         end
     end
     self.selectedIdx = 1
-    self.activeNoteCache = {}
     self.sequence:play()
 end
 
@@ -156,7 +155,13 @@ function ViewModel:update()
     end
 end
 
-function ViewModel:destroy()
+function ViewModel:save()
+    print("saving", self.currentSongPath)
+    playdate.datastore.write(self.trackProps, self.currentSongPath, true)
+end
+
+function ViewModel:finish()
+    self:save()
     self.sequence:stop()
 end
 

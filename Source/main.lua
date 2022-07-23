@@ -10,24 +10,25 @@ local gfx = playdate.graphics
 playdate.display.setRefreshRate(50)
 gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
 
-local currentSongName
+local currentSongPath
 local viewModel
 local view
 
-songNames = lume.filter(
-    playdate.file.listFiles("songs"),
+songPaths = lume.filter(
+    listFilesRecursive(),
     function(filename)
-        print("yo filename", filename)
         return endsWith(string.lower(filename), ".mid")
     end
 )
 
+printTable(songPaths)
+
 local function initNextSong()
     if viewModel then
-        viewModel:destroy()
+        viewModel:finish()
     end
-    currentSongName = selectNext(songNames, currentSongName)
-    viewModel = ViewModel(currentSongName)
+    currentSongPath = selectNext(songPaths, currentSongPath)
+    viewModel = ViewModel(currentSongPath)
     view = View(viewModel)
 end
 
@@ -42,7 +43,7 @@ end
 function playdate.keyReleased(key)
     print("Released " .. key .. " key")
 
-    if key == "q" then
+    if key == "z" then
         initNextSong()
     else
         viewModel:keyReleased(key)

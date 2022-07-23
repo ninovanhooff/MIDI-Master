@@ -4,6 +4,8 @@
 --- DateTime: 23/07/2022 12:48
 ---
 
+local file <const> = playdate.file
+
 function endsWith(str, ending)
     return ending == "" or str:sub(-#ending) == ending
 end
@@ -14,4 +16,28 @@ function selectNext(tbl, current)
         nextIndex = 1
     end
     return tbl[nextIndex]
+end
+
+local function listFiles(path)
+    if path then
+        return file.listFiles(path)
+    else
+        return file.listFiles()
+    end
+end
+
+--- provide null for all available data dirs
+function listFilesRecursive(path)
+    local result = {}
+    for _, item in ipairs(listFiles(path)) do
+        if file.isdir(item) then
+            result = lume.merge(
+                result,
+                listFilesRecursive((path or "") .. item)
+            )
+        else
+            table.insert(result, (path or "") .. item)
+        end
+    end
+    return result
 end

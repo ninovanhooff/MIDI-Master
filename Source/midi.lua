@@ -40,8 +40,6 @@ function createSampleSynth(samplePath, trackProps)
 end
 
 function createWaveInstrument(polyphony, trackProps)
-    print("create wave instrument", polyphony, "props:")
-    printTable(trackProps)
     local inst = snd.instrument.new()
     for _=1, polyphony do
         inst:addVoice(newWaveSynth(trackProps))
@@ -50,8 +48,6 @@ function createWaveInstrument(polyphony, trackProps)
 end
 
 function createDrumInstrument(trackProps)
-    print("create drum instrument", "props:")
-    printTable(trackProps)
     local inst = snd.instrument.new()
     inst:addVoice(createSampleSynth("drums/kick", trackProps), 35)
     inst:addVoice(createSampleSynth("drums/kick", trackProps), 36)
@@ -81,26 +77,25 @@ function createInstrument(polyphony, trackProps)
     end
 end
 
-function loadMidi(path)
-    local s = snd.sequence.new(path)
-    local ntracks = s:getTrackCount()
+local function createTrackProps(s)
+    local numTracks = s:getTrackCount()
+    local trackProps = {}
     local active = {}
     local poly = 0
-    local trackProps = {}
 
-    for i=1,ntracks do
+    for i=1,numTracks do
         local track = s:getTrackAtIndex(i)
         if track ~= nil then
-            local props = {
+            local polyphony = track:getPolyphony()
+            if polyphony > 0 then active[#active+1] = i end
+            if polyphony > poly then poly = polyphony end
+            print("track "..i.." has polyphony ".. polyphony)
+
+            local props = trackProps[i] or {
                 isMuted = false,
                 isSolo = false,
             }
             trackProps[i] = props
-            local polyphony = track:getPolyphony(i)
-            if polyphony > 0 then active[#active+1] = i end
-            if polyphony > poly then poly = polyphony
-            end
-            print("track "..i.." has polyphony ".. polyphony)
 
             if i == 10 then
                 print("Creating Drums for track", i)
@@ -125,5 +120,31 @@ function loadMidi(path)
         end
     end
 
-    return s, trackProps
+    return trackProps
+end
+
+function loadTrackProps(s, trackProps)
+    local numTracks = s:getTrackCount()
+    for i=1,numTracks do
+        local track = s:getTrackAtIndex(i)
+        if track ~= nil then
+            local polyphony = track:getPolyphony()
+            track:setInstrument(createInstrument(polyphony, trackProps[i]))
+        end
+    end
+    return trackProps
+end
+
+function loadMidi(path, _trackProps)
+    print("loading", path)
+    local trackProps = _trackProps or {}
+    local s = snd.sequence.new(path)
+    local ntracks = s:getTrackCount()
+    print("ntracks", ntracks)
+
+    if ntracks == #trackProps then
+        return s, loadTrackProps(s, trackProps)
+    else
+        return s, createTrackProps(s)
+    end
 end
