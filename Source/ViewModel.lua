@@ -153,10 +153,8 @@ function ViewModel:changeTrackProp(trackNum, key, amount)
 end
 
 function ViewModel:movePlayHead(change)
-    local targetStep = lume.clamp(
-        self:getCurrentStep() + floor(change * self.crankSpeed),
-        1, self:getNumSteps()
-    )
+    local targetStep = self:getCurrentStep() + floor(change * self.crankSpeed)
+    targetStep = targetStep % self:getNumSteps()
     self.sequence:goToStep(targetStep, true)
 end
 
