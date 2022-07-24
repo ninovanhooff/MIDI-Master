@@ -148,7 +148,6 @@ function ViewModel:changeTrackProp(trackNum, key, amount)
 end
 
 function ViewModel:movePlayHead(change)
-    print(change)
     self.sequence:goToStep(self:getCurrentStep() + floor(change * self.crankSpeed), true)
 end
 

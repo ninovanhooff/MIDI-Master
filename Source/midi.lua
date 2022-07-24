@@ -15,7 +15,6 @@ local defaultWaveRelease <const> = 0
 function newWaveSynth(trackProps)
     local s = snd.synth.new(trackProps.synth or snd.kWaveSawtooth)
     s:setVolume(trackProps.volume or defaultWaveVolume)
-    print("wave attack", trackProps.attack or defaultWaveAttack)
     s:setADSR(
         trackProps.attack or defaultWaveAttack,
         trackProps.decay or defaultWaveDecay, 
