@@ -103,9 +103,9 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     local potSpacing = 22
     local attack, decay, sustain, release = viewModel:getADSR(row)
 
-    local volumeX = muteButtonX + 24
-    local volumeY = buttonY + 12
-    local volumeTrackLength = 40
+    local volumeX <const> = muteButtonX + 24
+    local volumeY <const> = buttonY + 12
+    local volumeTrackLength <const> = 40
     local volumePos = lume.lerp(
         volumeX, volumeX+volumeTrackLength,
         viewModel:getVolume(row)
@@ -141,10 +141,10 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
         gfx.popContext()
     end
 
-        trackStrips[row]:draw(
-            trackControlsWidth - (viewModel:getProgress() * stripWidth),
-            y
-        )
+    trackStrips[row]:draw(
+        trackControlsWidth - (viewModel:getProgress() * stripWidth),
+        y
+    )
 
     gfx.popContext()
 end

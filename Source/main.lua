@@ -8,11 +8,17 @@ import "View"
 local gfx = playdate.graphics
 
 playdate.display.setRefreshRate(50)
+local screenW <const> = playdate.display.getWidth()
+local screenH <const> = playdate.display.getHeight()
+
 gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
 
 local currentSongPath
 local viewModel
 local view
+local messageRect <const> = playdate.geometry.rect.new(0, screenH - 20, screenW, 20)
+local messageTimer
+message = nil
 
 songPaths = lume.filter(
     listFilesRecursive(),
@@ -37,7 +43,34 @@ initNextSong()
 function playdate.update()
     viewModel:update()
     view:draw()
+
+    if message then
+        showMessage()
+    end
+
     playdate.timer:updateTimers()
+end
+
+function setMessage(text)
+    message = text
+
+end
+
+function setMessage(text)
+    message = text
+    messageTimer = playdate.timer.performAfterDelay(2000, function()
+        message = nil
+    end)
+end
+
+function showMessage()
+    gfx.pushContext()
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRect(messageRect)
+    gfx.setColor(gfx.kColorBlack)
+    gfx.drawLine(messageRect.x, messageRect.y, messageRect.right, messageRect.y)
+    gfx.getFont():drawText(message, messageRect.x + 4, messageRect.y + 4)
+    gfx.popContext()
 end
 
 function playdate.keyReleased(key)
