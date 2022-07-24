@@ -28,12 +28,16 @@ end
 
 --- provide null for all available data dirs
 function listFilesRecursive(path)
+    print("listrecursive ", path)
     local result = {}
     for _, item in ipairs(listFiles(path)) do
-        if file.isdir(item) then
+        local itemPath = (path or "") .. item
+        print(itemPath)
+        if file.isdir(itemPath) then
+            print("--", itemPath)
             result = lume.merge(
                 result,
-                listFilesRecursive((path or "") .. item)
+                listFilesRecursive(itemPath)
             )
         else
             table.insert(result, (path or "") .. item)
