@@ -65,6 +65,10 @@ function ViewModel:getTrack(trackNum)
     return self.sequence:getTrackAtIndex(trackNum)
 end
 
+function ViewModel:getVolume(trackNum)
+    return self.trackProps[trackNum].volume
+end
+
 function ViewModel:getNotes(trackNum)
     return self:getTrack(trackNum):getNotes(1, self:getNumSteps())
 end
@@ -141,6 +145,7 @@ function ViewModel:changeTrackProp(trackNum, key, amount)
         trackProps[key] + amount,
         0, 1
     )
+    printTable(trackProps)
     track:setInstrument(createInstrument(
         track:getPolyphony(), trackProps
     ))
@@ -182,6 +187,10 @@ function ViewModel:keyReleased(key)
         self:toggleSolo(trackNum)
     elseif key == "i" then
         self:toggleInstrument(trackNum)
+    elseif key == "v" then
+        self:changeTrackProp(trackNum, "volume", -0.1)
+    elseif key == "b" then
+        self:changeTrackProp(trackNum, "volume", 0.1)
     elseif key == "r" then
         self:changeTrackProp(trackNum, "attack", 0.1)
     elseif key == "f" then

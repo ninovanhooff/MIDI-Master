@@ -98,21 +98,34 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.drawText("m", muteButtonX + 3, buttonY)
 
     gfx.setLineWidth(2)
-    local potY = y + 30
+    local potY = y + 12
+    local potY2 = y + 30
     local potSpacing = 22
     local attack, decay, sustain, release = viewModel:getADSR(row)
+
+    local volumeX = muteButtonX + 24
+    local volumeY = buttonY + 12
+    local volumeTrackLength = 40
+    local volumePos = lume.lerp(
+        volumeX, volumeX+volumeTrackLength,
+        viewModel:getVolume(row)
+    )
+    gfx.drawLine(volumeX, volumeY, volumeX+volumeTrackLength, volumeY)
+    gfx.fillCircleAtPoint(volumePos, volumeY, 4)
+    gfx.drawLine(volumePos, volumeY-2, volumePos, volumeY+2)
+
     -- attack
-    local attackX = muteButtonX + 40
+    local attackX = trackControlsWidth - 40
     drawPot("a", attackX, potY, attack)
     -- decay
     local decayX = attackX + potSpacing
     drawPot("d", decayX, potY, decay)
     -- sustain
-    local sustainX = decayX + potSpacing
-    drawPot("s", sustainX, potY, sustain)
+    local sustainX = attackX
+    drawPot("s", sustainX, potY2, sustain)
     -- release
     local releaseX = sustainX + potSpacing
-    drawPot("r", releaseX, potY, release)
+    drawPot("r", releaseX, potY2, release)
 
 
     gfx.setLineWidth(1)
