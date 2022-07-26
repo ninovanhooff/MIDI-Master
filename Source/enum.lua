@@ -19,8 +19,8 @@ function enum(names, offset)
         objects[id] = obj
         size=size+1
     end
-    objects.idstart = offset        -- start of the id range being used
-    objects.idend = offset+size-1   -- end of the id range being used
+    objects.idStart = offset        -- start of the id range being used
+    objects.idEnd = offset+size-1   -- end of the id range being used
     objects.size=size
     objects.all = function()
         local list = {}

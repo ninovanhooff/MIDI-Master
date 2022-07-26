@@ -161,8 +161,9 @@ function ViewModel:movePlayHead(change)
 end
 
 function ViewModel:onIncrease()
-    if type(self.trackProps[self.selectedIdx][self.selectedTool.name]) == "boolean" then
-        self.trackProps[self.selectedIdx][self.selectedTool.name] = not self.trackProps[self.selectedIdx][self.selectedTool.name]
+    local selectedTrack = self.trackProps[self.selectedIdx]
+    if type(selectedTrack[self.selectedTool.name]) == "boolean" then
+        selectedTrack[self.selectedTool.name] = not selectedTrack[self.selectedTool.name]
     else
         self:changeTrackProp(self.selectedIdx, self.selectedTool.name, 0.1)
     end

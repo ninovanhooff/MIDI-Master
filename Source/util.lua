@@ -19,10 +19,10 @@ function selectNext(tbl, current)
 end
 
 function selectNextEnum(enum, current)
-    if current.id < enum.idend then
+    if current.id < enum.idEnd then
         return enum[current.id + 1]
     else
-        return enum[enum.idstart]
+        return enum[enum.idStart]
     end
 end
 
