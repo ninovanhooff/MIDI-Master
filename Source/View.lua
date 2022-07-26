@@ -9,15 +9,17 @@ import "CoreLibs/ui"
 import "CoreLibs/graphics"
 
 local gfx <const> = playdate.graphics
+local rect <const> = playdate.geometry.rect
 local lume <const> = lume
 local screenW <const> = playdate.display.getWidth()
+local tools <const> = tools
 local floor <const> = math.floor
 local listY <const> = 18
 local smallGutter <const> = 2
 local gutter <const> = 4
 local trackControlsWidth <const> = 150
 local buttonRadius <const> = 2
-local rowHeight <const> = 38
+local rowHeight <const> = 40
 local progressBarWidth <const> = 100
 local progressBarX <const> = screenW - progressBarWidth - smallGutter
 local viewModel
@@ -66,6 +68,7 @@ end
 
 function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.pushContext()
+    local selectedToolRect = nil
     if selected then
         gfx.fillRect(x,y+1,trackControlsWidth,height)
     else
@@ -98,20 +101,22 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.drawText("m", muteButtonX + 3, buttonY)
 
     gfx.setLineWidth(2)
-    local potY = y + 12
-    local potY2 = y + 30
+    local potY = y + 13
+    local potY2 = y + 31
     local potSpacing = 22
     local attack, decay, sustain, release = viewModel:getADSR(row)
 
+    -- volume
     local volumeX <const> = muteButtonX + 24
-    local volumeY <const> = buttonY + 12
+    local volumeY <const> = buttonY + 11
     local volumeTrackLength <const> = 40
+    local volumeHeight <const> = 8
     local volumePos = lume.lerp(
         volumeX, volumeX+volumeTrackLength,
         viewModel:getVolume(row)
     )
     gfx.drawLine(volumeX, volumeY, volumeX+volumeTrackLength, volumeY)
-    gfx.fillCircleAtPoint(volumePos, volumeY, 4)
+    gfx.fillCircleAtPoint(volumePos, volumeY, volumeHeight / 2)
     gfx.drawLine(volumePos, volumeY-2, volumePos, volumeY+2)
 
     -- attack
@@ -127,8 +132,35 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     local releaseX = sustainX + potSpacing
     drawPot("r", releaseX, potY2, release)
 
+    if selected then
+        local tool = viewModel.selectedTool
+        if tool == tools.isSolo then
+            selectedToolRect = rect.new(soloButtonX - 2, buttonY - 2, 20, 20)
+        elseif tool == tools.isMuted then
+            selectedToolRect = rect.new(muteButtonX - 2, buttonY - 2, 20, 20)
+        elseif tool == tools.volume then
+            selectedToolRect = rect.new(volumeX - 4, volumeY - 6, volumeTrackLength + 7, volumeHeight + 3)
+        elseif tool == tools.attack then
+            selectedToolRect = rect.new(attackX - 11, potY - 10, 22, 18)
+        elseif tool == tools.decay then
+            selectedToolRect = rect.new(decayX - 11, potY - 10, 22, 18)
+        elseif tool == tools.sustain then
+            selectedToolRect = rect.new(sustainX - 11, potY2 - 10, 22, 18)
+        elseif tool == tools.release then
+            selectedToolRect = rect.new(releaseX - 11, potY2 - 10, 22, 18)
+        end
+    end
+
 
     gfx.setLineWidth(1)
+    -- selected tool rectangle
+    if selectedToolRect then
+        gfx.pushContext()
+        gfx.setLineWidth(2)
+        gfx.setPattern({0x77, 0xBB, 0xDD, 0xEE, 0x77, 0xBB, 0xDD, 0xEE})
+        gfx.drawRoundRect(selectedToolRect, 2)
+        gfx.popContext()
+    end
 
     -- Notes
     gfx.setClipRect(x+trackControlsWidth, listY, screenW-x-trackControlsWidth, 240)

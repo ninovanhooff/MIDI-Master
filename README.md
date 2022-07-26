@@ -21,7 +21,7 @@ Currently, Playdate controls are not implemented, and the keyboard can be used i
 
 See the bottom part of [ViewModel.lua](https://github.com/ninovanhooff/MIDI-Master/blob/main/Source/ViewModel.lua)
 
-### Save/load
+### Other
 
 up/down - previous/next track in song
 

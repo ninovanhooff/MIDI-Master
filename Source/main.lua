@@ -1,7 +1,10 @@
+import "CoreLibs/object"
 lume = import "lume"
 import "util"
+import "enum"
 import "Instrument"
 import "midi"
+import "model"
 import "ViewModel"
 import "View"
 

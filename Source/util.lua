@@ -18,6 +18,14 @@ function selectNext(tbl, current)
     return tbl[nextIndex]
 end
 
+function selectNextEnum(enum, current)
+    if current.id < enum.idend then
+        return enum[current.id + 1]
+    else
+        return enum[enum.idstart]
+    end
+end
+
 local function listFiles(path)
     if path then
         return file.listFiles(path)
@@ -28,19 +36,16 @@ end
 
 --- provide null for all available data dirs
 function listFilesRecursive(path)
-    print("listrecursive ", path)
     local result = {}
     for _, item in ipairs(listFiles(path)) do
         local itemPath = (path or "") .. item
-        print(itemPath)
         if file.isdir(itemPath) then
-            print("--", itemPath)
             result = lume.merge(
                 result,
                 listFilesRecursive(itemPath)
             )
         else
-            table.insert(result, (path or "") .. item)
+            table.insert(result, itemPath)
         end
     end
     return result

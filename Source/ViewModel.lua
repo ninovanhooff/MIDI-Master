@@ -8,16 +8,17 @@ import "CoreLibs/object"
 
 local snd <const> = playdate.sound
 
+local tools <const> = tools
 local floor <const> = math.floor
 local getCrankChange <const> = playdate.getCrankChange
 local justPressed <const> = playdate.buttonJustPressed
 -- local justReleased <const> = playdate.buttonJustReleased
 local buttonDown <const> = playdate.kButtonDown
 local buttonUp <const> = playdate.kButtonUp
---local buttonLeft <const> = playdate.kButtonLeft
---local buttonRight <const> = playdate.kButtonRight
---local buttonA <const> = playdate.kButtonA
---local buttonB <const> = playdate.kButtonB
+local buttonLeft <const> = playdate.kButtonLeft
+local buttonRight <const> = playdate.kButtonRight
+local buttonA <const> = playdate.kButtonA
+local buttonB <const> = playdate.kButtonB
 
 class("ViewModel").extends()
 
@@ -39,6 +40,7 @@ function ViewModel:init(songPath)
         end
     end
     self.selectedIdx = 1
+    self.selectedTool = tools.attack
     self:applyMuteAndSolo()
     self.crankSpeed = self.sequence:getTempo() / 4
     self.sequence:play()
@@ -158,11 +160,29 @@ function ViewModel:movePlayHead(change)
     self.sequence:goToStep(targetStep, true)
 end
 
+function ViewModel:onIncrease()
+    if type(self.trackProps[self.selectedIdx][self.selectedTool.name]) == "boolean" then
+        self.trackProps[self.selectedIdx][self.selectedTool.name] = not self.trackProps[self.selectedIdx][self.selectedTool.name]
+    else
+        self:changeTrackProp(self.selectedIdx, self.selectedTool.name, 0.1)
+    end
+end
+
+function ViewModel:onDecrease()
+    self:changeTrackProp(self.selectedIdx, self.selectedTool.name, -0.1)
+end
+
 function ViewModel:update()
     if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
         self.selectedIdx = self.selectedIdx + 1
     elseif justPressed(buttonUp) and self.selectedIdx > 1 then
         self.selectedIdx = self.selectedIdx - 1
+    elseif justPressed(buttonRight) then
+        self.selectedTool = selectNextEnum(tools, self.selectedTool)
+    elseif justPressed(buttonA) then
+        self:onIncrease()
+    elseif justPressed(buttonB) then
+        self:onDecrease()
     end
 
     local _, accChange = getCrankChange()
