@@ -18,6 +18,14 @@ function selectNext(tbl, current)
     return tbl[nextIndex]
 end
 
+function selectPrevious(tbl, current)
+    local prevIndex = (lume.find(tbl, current) or 0) - 1
+    if prevIndex < 1 then
+        prevIndex = #tbl
+    end
+    return tbl[prevIndex]
+end
+
 function selectNextEnum(enum, current)
     if current.id < enum.idEnd then
         return enum[current.id + 1]

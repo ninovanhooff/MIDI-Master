@@ -41,10 +41,26 @@ local function initNextSong()
     view = View(viewModel)
 end
 
+local function initPreviousSong()
+    if viewModel then
+        viewModel:finish()
+    end
+    currentSongPath = selectPrevious(songPaths, currentSongPath)
+    viewModel = ViewModel(currentSongPath)
+    view = View(viewModel)
+end
+
 initNextSong()
 
 function playdate.update()
     viewModel:update()
+    if viewModel.loadNextSong then
+        initNextSong()
+        return
+    elseif viewModel.loadPreviousSong then
+        initPreviousSong()
+        return
+    end
     view:draw()
 
     if message then

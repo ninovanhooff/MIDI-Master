@@ -21,6 +21,7 @@ local trackControlsWidth <const> = 150
 local buttonRadius <const> = 2
 local rowHeight <const> = 40
 local progressBarWidth <const> = 100
+local selectionWidth <const> = 2
 local progressBarX <const> = screenW - progressBarWidth - smallGutter
 local viewModel
 local listView = playdate.ui.gridview.new(0, rowHeight)
@@ -68,7 +69,7 @@ end
 
 function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.pushContext()
-    local selectedToolRect = nil
+    local selectedToolRect
     if selected then
         gfx.fillRect(x,y+1,trackControlsWidth,height)
     else
@@ -156,7 +157,7 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     -- selected tool rectangle
     if selectedToolRect then
         gfx.pushContext()
-        gfx.setLineWidth(2)
+        gfx.setLineWidth(selectionWidth)
         gfx.setPattern({0x77, 0xBB, 0xDD, 0xEE, 0x77, 0xBB, 0xDD, 0xEE})
         gfx.drawRoundRect(selectedToolRect, 2)
         gfx.popContext()
@@ -191,7 +192,17 @@ function View:draw()
     gfx.clear(gfx.kColorWhite)
 
     -- draw filename without escapes
-    gfx.getFont():drawText(viewModel.currentSongPath, 2,2)
+    local font = gfx.getFont()
+    font:drawText(viewModel.currentSongPath, 2,2)
+
+    if viewModel.selectedIdx == 0 then
+        -- song selection
+        gfx.pushContext()
+        gfx.setLineWidth(selectionWidth)
+        gfx.setPattern({0x88, 0x44, 0x22, 0x11, 0x88, 0x44, 0x22, 0x11})
+        gfx.drawRoundRect(1,1, font:getTextWidth(viewModel.currentSongPath) + 4, 18, 2)
+        gfx.popContext()
+    end
 
     if self.error then
         gfx.drawText(self.error, 50,100)

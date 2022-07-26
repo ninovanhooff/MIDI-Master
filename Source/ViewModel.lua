@@ -161,7 +161,9 @@ function ViewModel:movePlayHead(change)
 end
 
 function ViewModel:onIncrease()
-    if self.selectedTool == tools.isMuted then
+    if self.selectedIdx == 0 then
+        self.loadNextSong = true
+    elseif self.selectedTool == tools.isMuted then
         self:toggleMuted(self.selectedIdx)
     elseif self.selectedTool == tools.isSolo then
         self:toggleSolo(self.selectedIdx)
@@ -171,13 +173,21 @@ function ViewModel:onIncrease()
 end
 
 function ViewModel:onDecrease()
-    self:changeTrackProp(self.selectedIdx, self.selectedTool.name, -0.1)
+    if self.selectedIdx == 0 then
+        self.loadPreviousSong = true
+    elseif self.selectedTool == tools.isMuted then
+        self:toggleMuted(self.selectedIdx)
+    elseif self.selectedTool == tools.isSolo then
+        self:toggleSolo(self.selectedIdx)
+    else
+        self:changeTrackProp(self.selectedIdx, self.selectedTool.name, -0.1)
+    end
 end
 
 function ViewModel:update()
     if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
         self.selectedIdx = self.selectedIdx + 1
-    elseif justPressed(buttonUp) and self.selectedIdx > 1 then
+    elseif justPressed(buttonUp) and self.selectedIdx > 0 then
         self.selectedIdx = self.selectedIdx - 1
     elseif justPressed(buttonLeft) then
         self.selectedTool = selectPreviousEnum(tools, self.selectedTool)
