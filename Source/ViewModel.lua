@@ -161,9 +161,10 @@ function ViewModel:movePlayHead(change)
 end
 
 function ViewModel:onIncrease()
-    local selectedTrack = self.trackProps[self.selectedIdx]
-    if type(selectedTrack[self.selectedTool.name]) == "boolean" then
-        selectedTrack[self.selectedTool.name] = not selectedTrack[self.selectedTool.name]
+    if self.selectedTool == tools.isMuted then
+        self:toggleMuted(self.selectedIdx)
+    elseif self.selectedTool == tools.isSolo then
+        self:toggleSolo(self.selectedIdx)
     else
         self:changeTrackProp(self.selectedIdx, self.selectedTool.name, 0.1)
     end
