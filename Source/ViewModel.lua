@@ -178,6 +178,8 @@ function ViewModel:update()
         self.selectedIdx = self.selectedIdx + 1
     elseif justPressed(buttonUp) and self.selectedIdx > 1 then
         self.selectedIdx = self.selectedIdx - 1
+    elseif justPressed(buttonLeft) then
+        self.selectedTool = selectPreviousEnum(tools, self.selectedTool)
     elseif justPressed(buttonRight) then
         self.selectedTool = selectNextEnum(tools, self.selectedTool)
     elseif justPressed(buttonA) then

@@ -26,6 +26,14 @@ function selectNextEnum(enum, current)
     end
 end
 
+function selectPreviousEnum(enum, current)
+    if current.id > enum.idStart then
+        return enum[current.id - 1]
+    else
+        return enum[enum.idEnd]
+    end
+end
+
 local function listFiles(path)
     if path then
         return file.listFiles(path)
