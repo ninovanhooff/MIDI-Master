@@ -120,15 +120,26 @@ function ViewModel:toggleSolo(trackNum)
     self:applyMuteAndSolo()
 end
 
-function ViewModel:toggleInstrument(trackNum)
-    local props = self.trackProps[trackNum]
-    local curSynth = props.synth
-    props.synth = selectNext(synths, curSynth)
+function ViewModel:applyInstrument(trackNum, props)
     local polyphony = self:getTrack(trackNum):getPolyphony()
     local newInstrument = createInstrument(polyphony, props)
     self:getTrack(trackNum):setInstrument(newInstrument)
     -- calling play again will apply the changes to the running sequence
     self.sequence:play()
+end
+
+function ViewModel:previousInstrument(trackNum)
+    local props = self.trackProps[trackNum]
+    local curSynth = props.synth
+    props.synth = selectPrevious(synths, curSynth)
+    self:applyInstrument(trackNum, props)
+end
+
+function ViewModel:nextInstrument(trackNum)
+    local props = self.trackProps[trackNum]
+    local curSynth = props.synth
+    props.synth = selectNext(synths, curSynth)
+    self:applyInstrument(trackNum, props)
 end
 
 function ViewModel:getADSR(trackNum)
@@ -163,6 +174,8 @@ end
 function ViewModel:onIncrease()
     if self.selectedIdx == 0 then
         self.loadNextSong = true
+    elseif self.selectedTool == tools.instrument then
+        self:nextInstrument(self.selectedIdx)
     elseif self.selectedTool == tools.isMuted then
         self:toggleMuted(self.selectedIdx)
     elseif self.selectedTool == tools.isSolo then
@@ -175,6 +188,8 @@ end
 function ViewModel:onDecrease()
     if self.selectedIdx == 0 then
         self.loadPreviousSong = true
+    elseif self.selectedTool == tools.instrument then
+        self:previousInstrument(self.selectedIdx)
     elseif self.selectedTool == tools.isMuted then
         self:toggleMuted(self.selectedIdx)
     elseif self.selectedTool == tools.isSolo then
@@ -223,7 +238,7 @@ function ViewModel:keyReleased(key)
     elseif key == "n" then
         self:toggleSolo(trackNum)
     elseif key == "i" then
-        self:toggleInstrument(trackNum)
+        self:nextInstrument(trackNum)
     elseif key == "v" then
         self:changeTrackProp(trackNum, "volume", -0.1)
     elseif key == "b" then

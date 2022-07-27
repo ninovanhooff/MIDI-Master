@@ -70,6 +70,7 @@ end
 function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.pushContext()
     local selectedToolRect
+    local font = gfx.getFont()
     if selected then
         gfx.fillRect(x,y+1,trackControlsWidth,height)
     else
@@ -79,7 +80,7 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     gfx.setColor(playdate.graphics.kColorXOR)
     gfx.setImageDrawMode(gfx.kDrawModeNXOR) -- text
 
-    gfx.drawText(viewModel:trackName(row), x + gutter, y + gutter)
+    font:drawText(viewModel:trackName(row), x + gutter, y + gutter)
 
     local soloButtonX = x+gutter
     local muteButtonX = x + 16 + gutter*2
@@ -135,7 +136,9 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
 
     if selected then
         local tool = viewModel.selectedTool
-        if tool == tools.isSolo then
+        if tool == tools.instrument then
+            selectedToolRect = rect.new(x + smallGutter, y + smallGutter + 1, font:getTextWidth(viewModel:trackName(row)) + gutter, 15)
+        elseif tool == tools.isSolo then
             selectedToolRect = rect.new(soloButtonX - 2, buttonY - 2, 20, 20)
         elseif tool == tools.isMuted then
             selectedToolRect = rect.new(muteButtonX - 2, buttonY - 2, 20, 20)

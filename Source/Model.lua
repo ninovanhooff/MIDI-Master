@@ -7,6 +7,7 @@
 local enum <const> = enum
 
 tools = enum({
+    "instrument",
     "isSolo",
     "isMuted",
     "volume",
