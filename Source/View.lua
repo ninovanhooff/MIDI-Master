@@ -60,7 +60,7 @@ function View:init(vm)
         local notes = vm:getNotes(i)
         for _, note in ipairs(notes) do
             for curStep = note.step, note.step + note.length do
-                gfx.drawPixel(floor(curStep/stepsPerPixel), (note.note / 127) * rowHeight)
+                gfx.drawPixel(floor(curStep/stepsPerPixel), ((127-note.note) / 127) * rowHeight)
             end
         end
         gfx.popContext()
