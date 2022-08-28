@@ -3,41 +3,43 @@ lume = import "lume"
 import "util"
 import "enum"
 import "Instrument"
-import "midi"
+import "libs/master-player/midi"
 import "model"
 import "ViewModel"
 import "View"
 
-local gfx = playdate.graphics
+local gfx <const>  = playdate.graphics
+local datastore <const> = playdate.datastore
 
 playdate.display.setRefreshRate(50)
 local screenW <const> = playdate.display.getWidth()
 local screenH <const> = playdate.display.getHeight()
 
 gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
+local config = datastore.read() or { currentSongPath = songPaths[1] }
 
-local currentSongPath
+
 local viewModel
 local view
 local messageRect <const> = playdate.geometry.rect.new(0, screenH - 20, screenW, 20)
 local messageTimer
 message = nil
 
-songPaths = lume.filter(
-    listFilesRecursive(),
-    function(filename)
-        return endsWith(string.lower(filename), ".mid")
-    end
-)
+local function getSongPath()
+    return config.currentSongPath
+end
 
-printTable(songPaths)
+local function setSongPath(newPath)
+    config.currentSongPath = newPath
+    datastore.write(config)
+end
 
 local function initNextSong()
     if viewModel then
         viewModel:finish()
     end
-    currentSongPath = selectNext(songPaths, currentSongPath)
-    viewModel = ViewModel(currentSongPath)
+    setSongPath(selectNext(songPaths, getSongPath()))
+    viewModel = ViewModel(getSongPath())
     view = View(viewModel)
 end
 
@@ -45,12 +47,10 @@ local function initPreviousSong()
     if viewModel then
         viewModel:finish()
     end
-    currentSongPath = selectPrevious(songPaths, currentSongPath)
-    viewModel = ViewModel(currentSongPath)
+    setSongPath(selectPrevious(songPaths, getSongPath()))
+    viewModel = ViewModel(getSongPath())
     view = View(viewModel)
 end
-
-initNextSong()
 
 function playdate.update()
     viewModel:update()
@@ -101,3 +101,14 @@ function playdate.keyReleased(key)
         viewModel:keyReleased(key)
     end
 end
+
+songPaths = lume.filter(
+    listFilesRecursive(),
+    function(filename)
+        return endsWith(string.lower(filename), ".mid")
+    end
+)
+
+printTable(songPaths)
+viewModel = ViewModel(getSongPath())
+view = View(viewModel)
