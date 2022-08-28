@@ -7,6 +7,7 @@
 import "CoreLibs/object"
 
 local snd <const> = playdate.sound
+local lume <const> = lume
 
 local tools <const> = tools
 local floor <const> = math.floor
@@ -71,8 +72,14 @@ function ViewModel:getVolume(trackNum)
     return self.trackProps[trackNum].volume
 end
 
-function ViewModel:getNotes(trackNum)
-    return self:getTrack(trackNum):getNotes(1, self:getNumSteps())
+function ViewModel:getNotes(trackNum, step, maxStep)
+    return self:getTrack(trackNum):getNotes(step or 1, maxStep or self:getNumSteps())
+end
+
+function ViewModel:getNotesActive(trackNum)
+    local curStep = self:getCurrentStep()
+    local notes = self:getNotes(trackNum, curStep, curStep+100)
+    return lume.reduce(notes, function(a, b) return a .. math.floor(b.note) .. "," end, "")
 end
 
 function ViewModel:isMuted(trackNum)

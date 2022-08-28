@@ -166,10 +166,10 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
         gfx.popContext()
     end
 
-    -- Notes
+    -- clipRect for notes area
     gfx.setClipRect(x+trackControlsWidth, listY, screenW-x-trackControlsWidth, 240)
 
-
+    -- Shade silenced tracks
     if viewModel:isSilenced(row) then
         gfx.pushContext()
         gfx.setDitherPattern(0.8, gfx.image.kDitherTypeDiagonalLine) -- invert alpha due to bug in SDK
@@ -177,10 +177,15 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
         gfx.popContext()
     end
 
+    -- notes (trackStrips)
     trackStrips[row]:draw(
         trackControlsWidth - (viewModel:getProgress() * stripWidth),
         y
     )
+
+    -- note info
+    local activeNotesText = viewModel:getNotesActive(row)
+    gfx.drawText(activeNotesText, screenW - font:getTextWidth(activeNotesText), y + gutter)
 
     gfx.popContext()
 end
