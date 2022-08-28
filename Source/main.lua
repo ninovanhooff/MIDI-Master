@@ -112,3 +112,8 @@ songPaths = lume.filter(
 printTable(songPaths)
 viewModel = ViewModel(getSongPath())
 view = View(viewModel)
+
+local menu <const> = playdate.getSystemMenu()
+menu:addMenuItem("Save", function()
+    viewModel:save()
+end)
