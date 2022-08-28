@@ -61,7 +61,7 @@ end
 
 function ViewModel:trackName(idx)
     local synth = self.trackProps[idx].synth
-    return string.format("%s : ", idx) .. synthNames[synth]
+    return string.format("%s : ", idx) .. (synthNames[synth] or synth)
 end
 
 function ViewModel:getTrack(trackNum)

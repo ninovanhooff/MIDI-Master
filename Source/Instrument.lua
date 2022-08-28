@@ -15,7 +15,8 @@ synths = {
     snd.kWavePOPhase,
     snd.kWavePODigital,
     snd.kWavePOVosim,
-    "drums"
+    "drums",
+    "ChoirAh"
 }
 
 synthNames = {
@@ -27,5 +28,4 @@ synthNames = {
     [snd.kWavePOPhase] = "POPhase",
     [snd.kWavePODigital] = "PODigital",
     [snd.kWavePOVosim] = "POVosim",
-    drums = "Drums"
 }
