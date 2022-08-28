@@ -178,6 +178,14 @@ function ViewModel:movePlayHead(change)
     self.sequence:goToStep(targetStep, true)
 end
 
+local function changeAmount(tool)
+    if tool == tools.volume then
+        return 0.05
+    else
+        return 0.1
+    end
+end
+
 function ViewModel:onIncrease()
     if self.selectedIdx == 0 then
         self.loadNextSong = true
@@ -188,7 +196,7 @@ function ViewModel:onIncrease()
     elseif self.selectedTool == tools.isSolo then
         self:toggleSolo(self.selectedIdx)
     else
-        self:changeTrackProp(self.selectedIdx, self.selectedTool.name, 0.1)
+        self:changeTrackProp(self.selectedIdx, self.selectedTool.name, changeAmount(self.selectedTool))
     end
 end
 
@@ -202,7 +210,7 @@ function ViewModel:onDecrease()
     elseif self.selectedTool == tools.isSolo then
         self:toggleSolo(self.selectedIdx)
     else
-        self:changeTrackProp(self.selectedIdx, self.selectedTool.name, -0.1)
+        self:changeTrackProp(self.selectedIdx, self.selectedTool.name, -changeAmount(self.selectedTool))
     end
 end
 
