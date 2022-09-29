@@ -16,6 +16,14 @@ local screenW <const> = playdate.display.getWidth()
 local screenH <const> = playdate.display.getHeight()
 
 gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
+
+songPaths = lume.filter(
+    listFilesRecursive(),
+    function(filename)
+        return endsWith(string.lower(filename), ".mid")
+    end
+)
+
 local config = datastore.read() or { currentSongPath = songPaths[1] }
 
 
@@ -101,13 +109,6 @@ function playdate.keyReleased(key)
         viewModel:keyReleased(key)
     end
 end
-
-songPaths = lume.filter(
-    listFilesRecursive(),
-    function(filename)
-        return endsWith(string.lower(filename), ".mid")
-    end
-)
 
 printTable(songPaths)
 viewModel = ViewModel(getSongPath())
