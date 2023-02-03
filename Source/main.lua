@@ -1,3 +1,6 @@
+local gfx <const>  = playdate.graphics
+gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
+
 import "CoreLibs/object"
 lume = import "lume"
 import "util"
@@ -8,14 +11,12 @@ import "model"
 import "ViewModel"
 import "View"
 
-local gfx <const>  = playdate.graphics
 local datastore <const> = playdate.datastore
 
-playdate.display.setRefreshRate(50)
+playdate.display.setRefreshRate(20)
 local screenW <const> = playdate.display.getWidth()
 local screenH <const> = playdate.display.getHeight()
 
-gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
 
 songPaths = lume.filter(
     listFilesRecursive(),
