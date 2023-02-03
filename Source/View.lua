@@ -42,10 +42,11 @@ function View:init(vm)
     self.trackStripsBuilder = coroutine.create(self.drawStripsYielding)
 end
 
-function listView:drawCell(_, row, _, selected, x, y, width, height)
+function listView:drawInstrumentControls(row, selected, x, y, _, height)
+    local font <const> = gfx.getFont()
+
     gfx.pushContext()
     local selectedToolRect
-    local font = gfx.getFont()
     if selected then
         gfx.fillRect(x,y+1,trackControlsWidth,height)
     else
@@ -140,6 +141,13 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
         gfx.drawRoundRect(selectedToolRect, 2)
         gfx.popContext()
     end
+    gfx.popContext()
+end
+
+function listView:drawCell(_, row, _, selected, x, y, width, height)
+    listView:drawInstrumentControls(row, selected, x, y, width, height)
+    gfx.pushContext()
+    local font <const> = gfx.getFont()
 
     -- clipRect for notes area
     gfx.setClipRect(x+trackControlsWidth, listY, screenW-x-trackControlsWidth, 240)
