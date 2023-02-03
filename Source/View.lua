@@ -34,37 +34,12 @@ class("View").extends()
 function View:init(vm)
     trackStrips = {}
     viewModel = vm
-    local numTracks = vm.numTracks
     if vm.numTracks == 0 then
         self.error = "Number of tracks is 0. Was the filename spelled correctly?"
         return
     end
 
-    local numSteps = vm:getNumSteps()
-    local stepsPerPixel = lume.clamp(
-        numSteps / screenW,
-        1, 4
-    )
-    if numSteps / stepsPerPixel > 4000 then
-        -- this would be too wide for comfort, bitmap size is limiting factor
-        stepsPerPixel = numSteps / 4000
-    end
-    stripWidth = numSteps / stepsPerPixel
-    print("steps per pixel", stepsPerPixel, "stripWidth", stripWidth)
-    listView:setNumberOfRows(numTracks)
-    for i = 1, numTracks do
-        local curStrip = gfx.image.new(stripWidth, rowHeight)
-        gfx.pushContext(curStrip)
-        trackStrips[i] = curStrip
-
-        local notes = vm:getNotes(i)
-        for _, note in ipairs(notes) do
-            for curStep = note.step, note.step + note.length do
-                gfx.drawPixel(floor(curStep/stepsPerPixel), ((127-note.note) / 127) * rowHeight)
-            end
-        end
-        gfx.popContext()
-    end
+    self.trackStripsBuilder = coroutine.create(self.drawStripsYielding)
 end
 
 function listView:drawCell(_, row, _, selected, x, y, width, height)
@@ -178,10 +153,13 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     end
 
     -- notes (trackStrips)
-    trackStrips[row]:draw(
-        trackControlsWidth - (viewModel:getProgress() * stripWidth),
-        y
-    )
+    if trackStrips[row] then
+        trackStrips[row]:draw(
+            trackControlsWidth - (viewModel:getProgress() * stripWidth),
+            y
+        )
+    end
+
 
     -- note info
     local activeNotesText = viewModel:getNotesActive(row)
@@ -196,8 +174,53 @@ function drawPot(text, x, y, value)
     gfx.drawText(text, x-4, y-8)
 end
 
+function View:drawStripsYielding()
+    local stepWindow = 10
+    local numTracks = viewModel.numTracks
+    local numSteps = viewModel:getNumSteps()
+    local stepsPerPixel = lume.clamp(
+        numSteps / screenW,
+        1, 4
+    )
+    if numSteps / stepsPerPixel > 4000 then
+        -- this would be too wide for comfort, bitmap size is limiting factor
+        stepsPerPixel = numSteps / 4000
+    end
+    stripWidth = numSteps / stepsPerPixel
+    print("steps per pixel", stepsPerPixel, "stripWidth", stripWidth)
+    listView:setNumberOfRows(numTracks)
+    for i = 1, numTracks do
+        coroutine.yield()
+        local curStrip = gfx.image.new(stripWidth, rowHeight)
+        trackStrips[i] = curStrip
+    end
+    for step = 1, viewModel:getNumSteps(), stepWindow do
+        coroutine.yield()
+        for i = 1, numTracks do
+            local curStrip = trackStrips[i]
+
+            local notes = viewModel:getNotes(i, step, step + stepWindow)
+            for _, note in ipairs(notes) do
+                gfx.pushContext(curStrip)
+                for curStep = note.step, note.step + note.length do
+                    gfx.drawPixel(floor(curStep/stepsPerPixel), ((127-note.note) / 127) * rowHeight)
+                end
+                gfx.popContext()
+            end
+        end
+    end
+end
+
 function View:draw()
     gfx.clear(gfx.kColorWhite)
+
+    if coroutine.status(self.trackStripsBuilder) ~= "dead" then
+        local _, message = coroutine.resume(self.trackStripsBuilder)
+        if message then
+            print(message)
+        end
+    end
+
 
     -- draw filename without escapes
     local font = gfx.getFont()
