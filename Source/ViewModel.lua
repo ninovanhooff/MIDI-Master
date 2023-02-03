@@ -47,6 +47,10 @@ function ViewModel:init(songPath)
     self.sequence:play()
 end
 
+function ViewModel:getTempo()
+    return self.sequence:getTempo()
+end
+
 function ViewModel:getNumSteps()
     return self.sequence:getLength()
 end
