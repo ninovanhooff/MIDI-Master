@@ -219,9 +219,11 @@ function View:buildStripsYielding()
             local notes = viewModel:getNotes(i, step, step + stepWindow)
             print("num Notes", #notes)
             for _, note in ipairs(notes) do
-                for curStep = note.step, note.step + note.length do
-                    gfx.drawPixel(floor(curStep/stepsPerPixel), ((127-note.note) / 127) * rowHeight)
-                end
+                local y = ((127-note.note) / 127) * rowHeight
+                gfx.drawLine(
+                    floor(note.step/stepsPerPixel), y,
+                    floor((note.step + note.length)/stepsPerPixel), y
+                )
             end
             gfx.popContext()
         end
