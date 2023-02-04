@@ -28,7 +28,7 @@ local selectionWidth <const> = 2
 local progressBarX <const> = screenW - progressBarWidth - smallGutter
 local viewModel
 local listView = playdate.ui.gridview.new(0, rowHeight)
-local maxStripWidth <const> = 1000
+local maxStripWidth <const> = 4000
 local trackStrips, stripWidth
 listView:setCellPadding(0, 0, 0, smallGutter) -- left, right , top, bottom
 

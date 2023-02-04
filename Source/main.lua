@@ -13,7 +13,7 @@ import "View"
 
 local datastore <const> = playdate.datastore
 
-playdate.display.setRefreshRate(20)
+playdate.display.setRefreshRate(30)
 local screenW <const> = playdate.display.getWidth()
 local screenH <const> = playdate.display.getHeight()
 
