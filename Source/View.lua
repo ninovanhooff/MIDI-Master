@@ -216,13 +216,11 @@ function View:buildStripsYielding()
     end
     for step = 1, numSteps, stepWindow do
         coroutine.yield()
-        print("rendering step", step, numSteps)
         for i = 1, numTracks do
             local curStrip = trackStrips[i]
             gfx.pushContext(curStrip)
 
             local notes = viewModel:getNotes(i, step, step + stepWindow)
-            print("num Notes", #notes)
             for _, note in ipairs(notes) do
                 local y = ((127-note.note) / 127) * rowHeight
                 gfx.drawLine(
