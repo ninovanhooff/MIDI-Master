@@ -16,11 +16,13 @@ local lume <const> = lume
 local screenW <const> = playdate.display.getWidth()
 local tools <const> = tools
 local floor <const> = math.floor
+local max <const> = math.max
 local isSimulator <const> = playdate.isSimulator
 local listY <const> = 18
 local smallGutter <const> = 2
 local gutter <const> = 4
 local trackControlsWidth <const> = 150
+local trackControlsRect <const> = playdate.geometry.rect.new(0, listY,trackControlsWidth + smallGutter,240-listY)
 local buttonRadius <const> = 2
 local rowHeight <const> = 40
 local progressBarWidth <const> = 100
@@ -49,14 +51,14 @@ end
 
 function listView:drawInstrumentControls(row, selected, x, y, _, height)
     gfx.pushContext()
-    local selectedToolRect
+
     if selected then
-        gfx.fillRect(x,y+1,trackControlsWidth,height)
+        gfx.fillRect(x,y,trackControlsWidth,height)
     else
-        gfx.drawRect(x,y+1,trackControlsWidth,height)
+        gfx.drawRect(x,y,trackControlsWidth,height)
     end
 
-    gfx.setColor(playdate.graphics.kColorXOR)
+    gfx.setColor(gfx.kColorXOR)
     gfx.setImageDrawMode(gfx.kDrawModeNXOR) -- text
 
     font:drawText(viewModel:trackName(row), x + gutter, y + gutter)
@@ -113,6 +115,7 @@ function listView:drawInstrumentControls(row, selected, x, y, _, height)
     local releaseX = sustainX + potSpacing
     drawPot("r", releaseX, potY2, release)
 
+    local selectedToolRect
     if selected then
         local tool = viewModel.selectedTool
         if tool == tools.instrument then
@@ -148,11 +151,13 @@ function listView:drawInstrumentControls(row, selected, x, y, _, height)
 end
 
 function listView:drawCell(_, row, _, selected, x, y, width, height)
-    --listView:drawInstrumentControls(row, selected, x, y, width, height)
+    if viewModel.controlsNeedDisplay or listView.needsDisplay then
+        listView:drawInstrumentControls(row, selected, x, y, width, height)
+    end
     gfx.pushContext()
 
     -- clipRect for notes area
-    gfx.setClipRect(x+trackControlsWidth, y, width, height)
+    gfx.setClipRect(x+trackControlsWidth, max(y, listY), width, height)
     gfx.setColor(gfx.kColorWhite)
     gfx.fillRect(x+trackControlsWidth, y, width, height)
     gfx.setColor(gfx.kColorBlack)
@@ -231,16 +236,21 @@ function View:buildStripsYielding()
 end
 
 function View:drawStaticUI()
+    gfx.pushContext()
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRect(0,0, screenW, listY)
+    gfx.setColor(gfx.kColorBlack)
     -- draw filename without escapes
     font:drawText(viewModel.currentSongPath, 2,2)
     -- progress outline
     gfx.drawRect(progressBarX, smallGutter, progressBarWidth, 12)
     self.staticUIDrawn = true
+    gfx.popContext()
 end
 
 function View:draw()
 
-    if not self.staticUIDrawn then
+    if not self.staticUIDrawn or viewModel.controlsNeedDisplay then
         self:drawStaticUI()
     end
 
@@ -289,6 +299,13 @@ function View:draw()
     end
 
     -- tracks (strips + controls)
-    listView:drawInRect(smallGutter, listY,screenW - smallGutter,220)
+    if viewModel.controlsNeedDisplay or listView.needsDisplay then
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRect(trackControlsRect)
+        gfx.setColor(gfx.kColorBlack)
+    end
+    listView:drawInRect(smallGutter, listY,screenW - smallGutter,240-listY)
+    viewModel.controlsNeedDisplay = false
+
 
 end

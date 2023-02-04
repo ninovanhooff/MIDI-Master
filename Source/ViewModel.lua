@@ -45,6 +45,8 @@ function ViewModel:init(songPath)
     self:applyMuteAndSolo()
     self.crankSpeed = self.sequence:getTempo() / 4
     self.sequence:play()
+    ---
+    self.controlsNeedDisplay = true
 end
 
 function ViewModel:getTempo()
@@ -121,6 +123,7 @@ function ViewModel:toggleMuted(trackNum)
     local isMuted = self:isMuted(trackNum)
     self.trackProps[trackNum].isMuted = not isMuted
     self:applyMuteAndSolo()
+    self.controlsNeedDisplay = true
 end
 
 function ViewModel:isSolo(trackNum)
@@ -130,6 +133,7 @@ end
 function ViewModel:toggleSolo(trackNum)
     self.trackProps[trackNum].isSolo = not self:isSolo(trackNum)
     self:applyMuteAndSolo()
+    self.controlsNeedDisplay = true
 end
 
 function ViewModel:applyInstrument(trackNum, props)
@@ -138,6 +142,7 @@ function ViewModel:applyInstrument(trackNum, props)
     self:getTrack(trackNum):setInstrument(newInstrument)
     -- calling play again will apply the changes to the running sequence
     self.sequence:play()
+    self.controlsNeedDisplay = true
 end
 
 function ViewModel:previousInstrument(trackNum)
@@ -175,6 +180,7 @@ function ViewModel:changeTrackProp(trackNum, key, amount)
         track:getPolyphony(), trackProps
     ))
     self.sequence:play()
+    self.controlsNeedDisplay = true
 end
 
 function ViewModel:movePlayHead(change)
@@ -203,6 +209,7 @@ function ViewModel:onIncrease()
     else
         self:changeTrackProp(self.selectedIdx, self.selectedTool.name, changeAmount(self.selectedTool))
     end
+    self.controlsNeedDisplay = true
 end
 
 function ViewModel:onDecrease()
@@ -217,17 +224,28 @@ function ViewModel:onDecrease()
     else
         self:changeTrackProp(self.selectedIdx, self.selectedTool.name, -changeAmount(self.selectedTool))
     end
+    self.controlsNeedDisplay = true
+end
+
+function ViewModel:setSelectedTrack(idx)
+    self.selectedIdx = idx
+    self.controlsNeedDisplay = true
+    end
+
+function ViewModel:setSelectedTool(toolEnum)
+    self.selectedTool = toolEnum
+    self.controlsNeedDisplay = true
 end
 
 function ViewModel:update()
     if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
-        self.selectedIdx = self.selectedIdx + 1
+        self:setSelectedTrack(self.selectedIdx + 1)
     elseif justPressed(buttonUp) and self.selectedIdx > 0 then
-        self.selectedIdx = self.selectedIdx - 1
+        self:setSelectedTrack(self.selectedIdx - 1)
     elseif justPressed(buttonLeft) then
-        self.selectedTool = selectPreviousEnum(tools, self.selectedTool)
+        self:setSelectedTool(selectPreviousEnum(tools, self.selectedTool))
     elseif justPressed(buttonRight) then
-        self.selectedTool = selectNextEnum(tools, self.selectedTool)
+        self:setSelectedTool(selectNextEnum(tools, self.selectedTool))
     elseif justPressed(buttonA) then
         self:onIncrease()
     elseif justPressed(buttonB) then
