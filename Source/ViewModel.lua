@@ -60,7 +60,8 @@ function ViewModel:getCurrentStep()
 end
 
 function ViewModel:getProgress()
-    return self:getCurrentStep() / self.sequence:getLength()
+    -- it seems currentstep can be larger than getLength, so clamp
+    return lume.clamp(self:getCurrentStep() / self.sequence:getLength(), 0, 1)
 end
 
 function ViewModel:trackName(idx)

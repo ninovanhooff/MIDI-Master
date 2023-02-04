@@ -253,10 +253,20 @@ function View:draw()
 
 
     -- progress
+    ---- clear, in case of rewind
+    gfx.setColor(gfx.kColorWhite)
+    gfx.fillRect(
+        progressBarX + smallGutter, smallGutter + smallGutter,
+        progressBarWidth - smallGutter - smallGutter,
+        12 - 2 * smallGutter)
+    ---- draw progress
+    gfx.setColor(gfx.kColorBlack)
     gfx.fillRect(
         progressBarX + smallGutter, smallGutter + smallGutter,
         (progressBarWidth - 2* smallGutter) * viewModel:getProgress(),
         12 - 2 * smallGutter)
+
+    -- title bar divider
     gfx.drawLine(0, listY - 1,screenW, listY - 1)
 
     if viewModel.selectedIdx == 0 then
