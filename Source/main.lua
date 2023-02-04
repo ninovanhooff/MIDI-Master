@@ -111,6 +111,14 @@ function playdate.keyReleased(key)
     end
 end
 
+function playdate.crankDocked()
+    viewModel:crankDocked()
+end
+
+function playdate.crankUndocked()
+    viewModel:crankUndocked()
+end
+
 printTable(songPaths)
 viewModel = ViewModel(getSongPath())
 view = View(viewModel)

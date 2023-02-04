@@ -8,12 +8,12 @@ import "CoreLibs/object"
 
 local snd <const> = playdate.sound
 local lume <const> = lume
+local abs <const> = math.abs
 
 local tools <const> = tools
 local floor <const> = math.floor
 local getCrankChange <const> = playdate.getCrankChange
 local justPressed <const> = playdate.buttonJustPressed
--- local justReleased <const> = playdate.buttonJustReleased
 local buttonDown <const> = playdate.kButtonDown
 local buttonUp <const> = playdate.kButtonUp
 local buttonLeft <const> = playdate.kButtonLeft
@@ -253,9 +253,21 @@ function ViewModel:update()
     end
 
     local _, accChange = getCrankChange()
-    if accChange ~= 0 then
+    if abs(accChange) > 1 then
         self:movePlayHead(accChange)
+        if not self.sequence:isPlaying() then
+            self.sequence:play()
+        end
     end
+end
+
+
+function ViewModel:crankDocked()
+    self.sequence:play()
+end
+
+function ViewModel:crankUndocked()
+    self.sequence:stop()
 end
 
 function ViewModel:save()
