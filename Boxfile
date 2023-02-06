@@ -1,0 +1,8 @@
+{
+    "toyboxes": {
+        "github.com/ninovanhooff/master-player": "main"
+    },
+    "installed": {
+        "github.com/ninovanhooff/master-player": "main@5991fb1618e79caa0b3c627c60f8972c606ff899"
+    }
+}

@@ -6,8 +6,10 @@
 
 import "CoreLibs/object"
 
+local masterplayer <const> = masterplayer
+local playdate <const> = playdate
 local snd <const> = playdate.sound
-local lume <const> = lume
+local lume <const> = masterplayer.lume
 local abs <const> = math.abs
 
 local tools <const> = tools
@@ -27,7 +29,7 @@ function ViewModel:init(songPath)
     self.currentSongPath = songPath
     self.trackProps = playdate.datastore.read(self.currentSongPath)
     print(songPath, trackProps)
-    self.sequence, self.trackProps = loadMidi(songPath, self.trackProps)
+    self.sequence, self.trackProps = masterplayer.loadMidi(songPath, self.trackProps)
 
     print("Sequence length (steps)", self.sequence:getLength())
     print("Sequence tempo", self.sequence:getTempo())

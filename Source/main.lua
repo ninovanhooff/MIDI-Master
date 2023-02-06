@@ -1,8 +1,9 @@
 local gfx <const>  = playdate.graphics
 gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
 
+import '../toyboxes/toyboxes.lua'
 import "CoreLibs/object"
-lume = import "lume"
+local lume <const> = masterplayer.lume
 import "util"
 import "enum"
 import "Instrument"
