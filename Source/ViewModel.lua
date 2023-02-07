@@ -69,8 +69,8 @@ function ViewModel:getProgress()
 end
 
 function ViewModel:trackName(idx)
-    local synth = self.trackProps[idx].synth
-    return string.format("%s : ", idx) .. (synthNames[synth] or synth)
+    local instrument = self.trackProps[idx].instrument
+    return string.format("%s : ", idx) .. (instrument.name)
 end
 
 function ViewModel:getTrack(trackNum)
@@ -140,7 +140,7 @@ end
 
 function ViewModel:applyInstrument(trackNum, props)
     local polyphony = self:getTrack(trackNum):getPolyphony()
-    local newInstrument = createInstrument(polyphony, props)
+    local newInstrument = masterplayer.createInstrument(polyphony, props)
     self:getTrack(trackNum):setInstrument(newInstrument)
     -- calling play again will apply the changes to the running sequence
     self.sequence:play()
@@ -149,15 +149,15 @@ end
 
 function ViewModel:previousInstrument(trackNum)
     local props = self.trackProps[trackNum]
-    local curSynth = props.synth
-    props.synth = selectPrevious(synths, curSynth)
+    local curSynth = props.instrument
+    props.instrument = selectPrevious(masterplayer.instruments, curSynth)
     self:applyInstrument(trackNum, props)
 end
 
 function ViewModel:nextInstrument(trackNum)
     local props = self.trackProps[trackNum]
-    local curSynth = props.synth
-    props.synth = selectNext(synths, curSynth)
+    local curSynth = props.instrument
+    props.instrument = selectNext(masterplayer.instruments, curSynth)
     self:applyInstrument(trackNum, props)
 end
 
@@ -178,7 +178,7 @@ function ViewModel:changeTrackProp(trackNum, key, amount)
         0, 1
     )
     printTable(trackProps)
-    track:setInstrument(createInstrument(
+    track:setInstrument(masterplayer.createInstrument(
         track:getPolyphony(), trackProps
     ))
     self.sequence:play()

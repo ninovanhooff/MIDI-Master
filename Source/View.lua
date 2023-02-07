@@ -12,7 +12,7 @@ local gfx <const> = playdate.graphics
 local font <const> = gfx.getFont()
 
 local rect <const> = playdate.geometry.rect
-local lume <const> = lume
+local lume <const> = masterplayer.lume
 local screenW <const> = playdate.display.getWidth()
 local tools <const> = tools
 local floor <const> = math.floor

@@ -6,8 +6,6 @@ import "CoreLibs/object"
 local lume <const> = masterplayer.lume
 import "util"
 import "enum"
-import "Instrument"
-import "libs/master-player/midi"
 import "model"
 import "ViewModel"
 import "View"
@@ -18,6 +16,8 @@ playdate.display.setRefreshRate(30)
 local screenW <const> = playdate.display.getWidth()
 local screenH <const> = playdate.display.getHeight()
 
+
+masterplayer.addInstrument(com_ninovanhooff_masterplayer_choir_ah, "ChoirAh")
 
 songPaths = lume.filter(
     listFilesRecursive(),

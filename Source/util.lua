@@ -4,6 +4,8 @@
 --- DateTime: 23/07/2022 12:48
 ---
 
+local lume <const> = masterplayer.lume
+
 local file <const> = playdate.file
 
 function endsWith(str, ending)
