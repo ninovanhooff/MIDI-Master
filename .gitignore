@@ -35,4 +35,7 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Toybox dependencies
 /toyboxes/
+/Source/toybox_assets/
