@@ -274,8 +274,8 @@ end
 
 function ViewModel:save()
     print("saving", self.currentSongPath)
-    setMessage("Saved : " .. self.currentSongPath .. ".json")
     playdate.datastore.write(self.trackProps, self.currentSongPath, true)
+    setMessage("Saved : " .. self.currentSongPath .. ".json")
 end
 
 function ViewModel:finish()
