@@ -18,6 +18,7 @@ local screenH <const> = playdate.display.getHeight()
 
 
 masterplayer.addInstrument(com_ninovanhooff_masterplayer_choir_ah, "ChoirAh")
+masterplayer.addInstrument(com_ninovanhooff_masterplayer_drums_electric, "Drums-E")
 
 songPaths = lume.filter(
     listFilesRecursive(),
