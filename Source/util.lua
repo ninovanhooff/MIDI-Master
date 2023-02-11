@@ -58,7 +58,7 @@ function listFilesRecursive(path)
     for _, item in ipairs(listFiles(path)) do
         local itemPath = (path or "") .. item
         if file.isdir(itemPath) then
-            result = lume.merge(
+            result = lume.concat(
                 result,
                 listFilesRecursive(itemPath)
             )
