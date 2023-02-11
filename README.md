@@ -38,3 +38,17 @@ Keyboard controls can be used in simulator or when using the simulator to contro
 
 See the bottom part of [ViewModel.lua](https://github.com/ninovanhooff/MIDI-Master/blob/main/Source/ViewModel.lua)
 for the mappings
+
+## Add your own sampled instruments (for Developers)
+
+MIDI Master comes with a few bundled sampled instruments. These are included as [Toyboxes](https://github.com/toyboxpy/toybox.py).
+To add your own instrument, create a Toybox out of it. As inspiration,
+
+Steps to add your own instrument to MIDI Master:
+
+- Create your own instrument as a Toybox./ See these examples: [Choir Ah](https://github.com/ninovanhooff/master-player-choir-ah), [Drums Electric](https://github.com/ninovanhooff/master-player-drums-electric).
+- Download the MIDI Master source code
+- Download [Toybox](https://github.com/toyboxpy/toybox.py)
+- Use Toybox to add your instrument to MIDI Master
+- open [main.lua](https://github.com/ninovanhooff/MIDI-Master/blob/main/Source/main.lua) and add your instrument using the `masterplayer.addInstrument()` function
+- compile MIDI Master
