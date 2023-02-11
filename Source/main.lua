@@ -27,6 +27,10 @@ songPaths = lume.filter(
     end
 )
 
+if #songPaths < 1 then
+    error("No songs found. Place your .mid files in the 'songs' folder inside the MIDI Master pdx" )
+end
+
 local config = datastore.read() or { currentSongPath = songPaths[1] }
 
 
