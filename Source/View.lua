@@ -210,12 +210,12 @@ function View:buildStripsYielding()
     print("steps per pixel", stepsPerPixel, "stripWidth", stripWidth)
     listView:setNumberOfRows(numTracks)
     for i = 1, numTracks do
-        coroutine.yield()
+        coroutine.yield(0)
         local curStrip = gfx.image.new(stripWidth, rowHeight)
         trackStrips[i] = curStrip
     end
     for step = 1, numSteps, stepWindow do
-        coroutine.yield()
+        coroutine.yield(step/numSteps)
         for i = 1, numTracks do
             local curStrip = trackStrips[i]
             gfx.pushContext(curStrip)
@@ -252,10 +252,11 @@ function View:draw()
         self:drawStaticUI()
     end
 
+    local loadProgress = 0
     if coroutine.status(self.trackStripsBuilder) ~= "dead" then
-        local _, message = coroutine.resume(self.trackStripsBuilder)
-        if message then
-            print(message)
+        _, loadProgress = coroutine.resume(self.trackStripsBuilder)
+        if not loadProgress then
+            loadProgress = 1
         end
     end
 
@@ -267,13 +268,22 @@ function View:draw()
         progressBarX + smallGutter, smallGutter + smallGutter,
         progressBarWidth - smallGutter - smallGutter,
         12 - 2 * smallGutter)
-    ---- draw progress
+    ---- draw load progress
     gfx.setColor(gfx.kColorBlack)
+    --gfx.setPattern({0xFF, 0xFF, 0xFF, 0x0, 0x0, 0xFF, 0xFF, 0xFF})
+    gfx.fillRect(
+        progressBarX + smallGutter*2, smallGutter + 5,
+        (progressBarWidth - 4* smallGutter) * loadProgress,
+        6 - 2 * smallGutter)
+    ---- draw play progress
+    gfx.setColor(gfx.kColorXOR)
     gfx.fillRect(
         progressBarX + smallGutter, smallGutter + smallGutter,
         (progressBarWidth - 2* smallGutter) * viewModel:getProgress(),
         12 - 2 * smallGutter)
 
+
+    gfx.setColor(gfx.kColorBlack)
     -- title bar divider
     gfx.drawLine(0, listY - 1,screenW, listY - 1)
 
