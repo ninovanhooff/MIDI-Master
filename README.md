@@ -5,6 +5,11 @@ A tool for mastering MIDI files.
 Masters are saved in the Data folder.
 This folder is created when you first save a master. On Mac, the location of that folder is `~/Developer/PlaydateSDK/Disk/Data/com.ninovanhooff.midimaster`
 
+## Differences between Simulator and hardware playback
+
+There may be differences in playback between Simulator and hardware devices, this also includes 
+cases where songs sound better on hardware. Testing on hardware is always recommended.
+
 ## Add your own songs
 
 ### Using the MIDI Master pdx
