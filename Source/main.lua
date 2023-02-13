@@ -82,18 +82,19 @@ function playdate.update()
         showMessage()
     end
 
+    messageJustHidden = false
     playdate.timer:updateTimers()
 end
 
 function setMessage(text)
     message = text
-
 end
 
 function setMessage(text)
     message = text
     messageTimer = playdate.timer.performAfterDelay(2000, function()
         message = nil
+        messageJustHidden = true
     end)
 end
 

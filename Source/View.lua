@@ -22,7 +22,6 @@ local listY <const> = 18
 local smallGutter <const> = 2
 local gutter <const> = 4
 local trackControlsWidth <const> = 150
-local trackControlsRect <const> = playdate.geometry.rect.new(0, listY,trackControlsWidth + smallGutter,240-listY)
 local buttonRadius <const> = 2
 local rowHeight <const> = 40
 local progressBarWidth <const> = 100
@@ -151,7 +150,7 @@ function listView:drawInstrumentControls(row, selected, x, y, _, height)
 end
 
 function listView:drawCell(_, row, _, selected, x, y, width, height)
-    if viewModel.controlsNeedDisplay or listView.needsDisplay then
+    if viewModel.controlsNeedDisplay or listView.needsDisplay or messageJustHidden then
         listView:drawInstrumentControls(row, selected, x, y, width, height)
     end
     gfx.pushContext()
@@ -313,9 +312,9 @@ function View:draw()
     end
 
     -- tracks (strips + controls)
-    if viewModel.controlsNeedDisplay or listView.needsDisplay then
+    if viewModel.controlsNeedDisplay or listView.needsDisplay or messageJustHidden then
         gfx.setColor(gfx.kColorWhite)
-        gfx.fillRect(trackControlsRect)
+        gfx.fillRect(0, listY,screenW,240-listY)
         gfx.setColor(gfx.kColorBlack)
     end
     listView:drawInRect(smallGutter, listY,screenW - smallGutter,240-listY)
