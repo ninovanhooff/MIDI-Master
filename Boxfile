@@ -2,6 +2,7 @@
     "toyboxes": {
         "github.com/ninovanhooff/master-player-choir-ah": "main",
         "github.com/ninovanhooff/master-player-drums-electric": "main",
+        "github.com/ninovanhooff/master-player-drums-pd": "main",
         "github.com/ninovanhooff/master-player": "main"
     },
     "installed": {
