@@ -30,6 +30,10 @@ function ViewModel:init(songPath)
     self.trackProps = playdate.datastore.read(self.currentSongPath)
     print(songPath, trackProps)
     self.sequence, self.trackProps = masterplayer.loadMidi(songPath, self.trackProps)
+    if not self.sequence then
+        -- trackProps should contain error
+        error(self.trackProps)
+    end
 
     print("Sequence length (steps)", self.sequence:getLength())
     print("Sequence tempo", self.sequence:getTempo())
