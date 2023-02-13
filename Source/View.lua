@@ -196,6 +196,9 @@ end
 
 function View:buildStripsYielding()
     local stepWindow = lume.clamp(viewModel:getTempo(), 1, 400)
+    if isSimulator then
+        stepWindow = stepWindow * 10
+    end
     local numTracks = viewModel.numTracks
     local numSteps = viewModel:getNumSteps()
     local stepsPerPixel = lume.clamp(
@@ -255,6 +258,9 @@ function View:draw()
     local loadProgress = 0
     if coroutine.status(self.trackStripsBuilder) ~= "dead" then
         _, loadProgress = coroutine.resume(self.trackStripsBuilder)
+        if type(loadProgress) == "string" then
+            error(loadProgress)
+        end
         if not loadProgress then
             loadProgress = 1
         end
