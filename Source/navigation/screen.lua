@@ -30,6 +30,15 @@ function Screen:gameWillResume()
     -- no-op, implemented in subclasses
 end
 
+function Screen:crankDocked()
+    -- no-op, implemented in subclasses
+end
+
+function Screen:crankUndocked()
+    -- no-op, implemented in subclasses
+end
+
+
 --- Called when this screen is popped off the stack. It will never be resumed,
 --- So this is a good place for freeing up RAM, cleanup, etc.
 function Screen:destroy()
