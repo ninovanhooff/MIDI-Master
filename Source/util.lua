@@ -4,9 +4,16 @@
 --- DateTime: 23/07/2022 12:48
 ---
 
+local currentTime <const> = playdate.sound.getCurrentTime
+
 local lume <const> = masterplayer.lume
 
 local file <const> = playdate.file
+
+function printT(...)
+    local arg = {...}
+    print(currentTime(), table.unpack(arg))
+end
 
 function endsWith(str, ending)
     return ending == "" or str:sub(-#ending) == ending
@@ -67,4 +74,8 @@ function listFilesRecursive(path)
         end
     end
     return result
+end
+
+function clamp(x, min, max)
+    return x < min and min or (x > max and max or x)
 end

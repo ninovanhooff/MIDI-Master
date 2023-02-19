@@ -3,12 +3,17 @@ gfx.setFont(playdate.graphics.font.new("fonts/font-pedallica"))
 
 import '../toyboxes/toyboxes.lua'
 import "CoreLibs/object"
+import "CoreLibs/crank"
+
 local lume <const> = masterplayer.lume
 import "util"
 import "enum"
+import "navigation/screen"
+local navigator <const> = import "navigation/navigator"
 import "model"
 import "ViewModel"
 import "View"
+import "fileselector/FileSelectorScreen"
 
 local datastore <const> = playdate.datastore
 
@@ -41,11 +46,11 @@ local messageRect <const> = playdate.geometry.rect.new(0, screenH - 20, screenW,
 local messageTimer
 message = nil
 
-local function getSongPath()
+function getSongPath()
     return config.currentSongPath
 end
 
-local function setSongPath(newPath)
+function setSongPath(newPath)
     config.currentSongPath = newPath
     datastore.write(config)
 end
@@ -69,15 +74,7 @@ local function initPreviousSong()
 end
 
 function playdate.update()
-    viewModel:update()
-    if viewModel.loadNextSong then
-        initNextSong()
-        return
-    elseif viewModel.loadPreviousSong then
-        initPreviousSong()
-        return
-    end
-    view:draw()
+    navigator:updateActiveScreen()
 
     if message then
         showMessage()
@@ -128,10 +125,20 @@ function playdate.crankUndocked()
 end
 
 printTable(songPaths)
-viewModel = ViewModel(getSongPath())
-view = View(viewModel)
+--viewModel = ViewModel(getSongPath())
+--view = View(viewModel)
 
 local menu <const> = playdate.getSystemMenu()
 menu:addMenuItem("Save", function()
     viewModel:save()
 end)
+
+function playdate.gameWillPause() navigator:gameWillPause() end
+function playdate.deviceWillLock() navigator:gameWillPause() end
+function playdate.gameWillResume() navigator:gameWillResume() end
+function playdate.deviceDidUnlock() navigator:gameWillResume() end
+
+pushScreen(FileSelectorScreen("Open file"))
+
+-- should remain last line to ensure activeScreen and proper navigation structure
+navigator:start()
