@@ -8,6 +8,7 @@ local activeScreen
 --- local navigator <const> = import "lua/navigator"
 --- <setup navigation stack by using one or more pushScreen calls>
 --- navigator:start()  -- must be called at the end of main.lua to ensure proper navigation state
+--- Add navigator:update() to your playdate.update() call
 
 local function popScreenImmediately()
     printT("Popping off backstack:", activeScreen.className, activeScreen)
@@ -94,6 +95,11 @@ function navigatorNS.Navigator:updateActiveScreen()
     activeScreen:update()
 end
 
+function navigatorNS.Navigator:update()
+    self:executePendingNavigators()
+    self:updateActiveScreen()
+end
+
 
 function navigatorNS.Navigator:gameWillPause()
     printT("GameWillPause screen", activeScreen.className, activeScreen)
@@ -103,6 +109,16 @@ end
 function navigatorNS.Navigator:gameWillResume()
     printT("GameWillResume screen", activeScreen.className, activeScreen)
     activeScreen:gameWillResume()
+end
+
+function navigatorNS.Navigator:crankDocked()
+    printT("Crank Docked for screen", activeScreen.className, activeScreen)
+    activeScreen:crankDocked()
+end
+
+function navigatorNS.Navigator:crankUndocked()
+    printT("Crank Undocked for screen", activeScreen.className, activeScreen)
+    activeScreen:crankUndocked()
 end
 
 function navigatorNS.Navigator:debugDraw()
