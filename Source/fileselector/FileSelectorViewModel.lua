@@ -72,8 +72,9 @@ function FileSelectorViewModel:update()
     elseif justPressed(buttonA) then
         self.aButtonPressedAtLeastOnce = true
     elseif justReleased(buttonA) and self.aButtonPressedAtLeastOnce then
-        setSongPath(self:selectedEntry().path)
-        -- todo start editor
+        local path = self:selectedEntry().path
+        setSongPath(path)
+        pushScreen(EditorScreen(path))
     elseif justPressed(buttonB) then
         popScreen()
     end
