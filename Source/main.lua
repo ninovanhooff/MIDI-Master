@@ -39,8 +39,6 @@ end
 local config = datastore.read() or { currentSongPath = songPaths[1] }
 
 
-local viewModel
-local view
 local messageRect <const> = playdate.geometry.rect.new(0, screenH - 20, screenW, 20)
 local messageTimer
 message = nil
@@ -55,7 +53,7 @@ function setSongPath(newPath)
 end
 
 function playdate.update()
-    navigator:updateActiveScreen()
+    navigator:update()
 
     if message then
         showMessage()
@@ -88,11 +86,11 @@ function showMessage()
 end
 
 function playdate.crankDocked()
-    viewModel:crankDocked()
+    navigator:crankDocked()
 end
 
 function playdate.crankUndocked()
-    viewModel:crankUndocked()
+    navigator:crankUndocked()
 end
 
 printTable(songPaths)
