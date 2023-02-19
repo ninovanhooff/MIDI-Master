@@ -23,9 +23,9 @@ local buttonRight <const> = playdate.kButtonRight
 local buttonA <const> = playdate.kButtonA
 local buttonB <const> = playdate.kButtonB
 
-class("ViewModel").extends()
+class("EditorViewModel").extends()
 
-function ViewModel:init(songPath)
+function EditorViewModel:init(songPath)
     self.currentSongPath = songPath
     self.trackProps = playdate.datastore.read(self.currentSongPath)
     print(songPath, trackProps)
@@ -55,52 +55,52 @@ function ViewModel:init(songPath)
     self.controlsNeedDisplay = true
 end
 
-function ViewModel:getTempo()
+function EditorViewModel:getTempo()
     return self.sequence:getTempo()
 end
 
-function ViewModel:getNumSteps()
+function EditorViewModel:getNumSteps()
     return self.sequence:getLength()
 end
 
-function ViewModel:getCurrentStep()
+function EditorViewModel:getCurrentStep()
     return self.sequence:getCurrentStep()
 end
 
-function ViewModel:getProgress()
+function EditorViewModel:getProgress()
     -- it seems currentstep can be larger than getLength, so clamp
     return lume.clamp(self:getCurrentStep() / self.sequence:getLength(), 0, 1)
 end
 
-function ViewModel:trackName(idx)
+function EditorViewModel:trackName(idx)
     local instrument = self.trackProps[idx].instrument
     return string.format("%s : ", idx) .. (instrument.name)
 end
 
-function ViewModel:getTrack(trackNum)
+function EditorViewModel:getTrack(trackNum)
     return self.sequence:getTrackAtIndex(trackNum)
 end
 
-function ViewModel:getVolume(trackNum)
+function EditorViewModel:getVolume(trackNum)
     return self.trackProps[trackNum].volume
 end
 
-function ViewModel:getNotes(trackNum, step, maxStep)
+function EditorViewModel:getNotes(trackNum, step, maxStep)
     return self:getTrack(trackNum):getNotes(step or 1, maxStep or self:getNumSteps())
 end
 
-function ViewModel:getNotesActive(trackNum)
+function EditorViewModel:getNotesActive(trackNum)
     local curStep = self:getCurrentStep()
     local notes = self:getNotes(trackNum, curStep, curStep+100)
     return lume.reduce(notes, function(a, b) return a .. math.floor(b.note) .. "," end, "")
 end
 
-function ViewModel:isMuted(trackNum)
+function EditorViewModel:isMuted(trackNum)
     return self.trackProps[trackNum].isMuted
 end
 
 --- when the track is silent, because it is muted or another track is solo
-function ViewModel:isSilenced(trackNum)
+function EditorViewModel:isSilenced(trackNum)
     local anySolo = false
     for _,item in ipairs(self.trackProps) do
         if item.isSolo then
@@ -113,7 +113,7 @@ function ViewModel:isSilenced(trackNum)
     return props.isMuted or (anySolo and not props.isSolo)
 end
 
-function ViewModel:applyMuteAndSolo()
+function EditorViewModel:applyMuteAndSolo()
     for i = 1, #self.trackProps do
         local track = self:getTrack(i)
         local muteTrack = self:isSilenced(i)
@@ -125,24 +125,24 @@ function ViewModel:applyMuteAndSolo()
     end
 end
 
-function ViewModel:toggleMuted(trackNum)
+function EditorViewModel:toggleMuted(trackNum)
     local isMuted = self:isMuted(trackNum)
     self.trackProps[trackNum].isMuted = not isMuted
     self:applyMuteAndSolo()
     self.controlsNeedDisplay = true
 end
 
-function ViewModel:isSolo(trackNum)
+function EditorViewModel:isSolo(trackNum)
     return self.trackProps[trackNum].isSolo
 end
 
-function ViewModel:toggleSolo(trackNum)
+function EditorViewModel:toggleSolo(trackNum)
     self.trackProps[trackNum].isSolo = not self:isSolo(trackNum)
     self:applyMuteAndSolo()
     self.controlsNeedDisplay = true
 end
 
-function ViewModel:applyInstrument(trackNum, props)
+function EditorViewModel:applyInstrument(trackNum, props)
     local polyphony = self:getTrack(trackNum):getPolyphony()
     local newInstrument = masterplayer.createInstrument(polyphony, props)
     self:getTrack(trackNum):setInstrument(newInstrument)
@@ -151,21 +151,21 @@ function ViewModel:applyInstrument(trackNum, props)
     self.controlsNeedDisplay = true
 end
 
-function ViewModel:previousInstrument(trackNum)
+function EditorViewModel:previousInstrument(trackNum)
     local props = self.trackProps[trackNum]
     local curSynth = props.instrument
     props.instrument = selectPrevious(masterplayer.instruments, curSynth)
     self:applyInstrument(trackNum, props)
 end
 
-function ViewModel:nextInstrument(trackNum)
+function EditorViewModel:nextInstrument(trackNum)
     local props = self.trackProps[trackNum]
     local curSynth = props.instrument
     props.instrument = selectNext(masterplayer.instruments, curSynth)
     self:applyInstrument(trackNum, props)
 end
 
-function ViewModel:getADSR(trackNum)
+function EditorViewModel:getADSR(trackNum)
     local props = self.trackProps[trackNum]
     return
         props.attack,
@@ -174,7 +174,7 @@ function ViewModel:getADSR(trackNum)
         props.release
 end
 
-function ViewModel:changeTrackProp(trackNum, key, amount)
+function EditorViewModel:changeTrackProp(trackNum, key, amount)
     local trackProps = self.trackProps[trackNum]
     local track = self:getTrack(trackNum)
     trackProps[key] = lume.clamp(
@@ -189,7 +189,7 @@ function ViewModel:changeTrackProp(trackNum, key, amount)
     self.controlsNeedDisplay = true
 end
 
-function ViewModel:movePlayHead(change)
+function EditorViewModel:movePlayHead(change)
     local targetStep = self:getCurrentStep() + floor(change * self.crankSpeed)
     targetStep = targetStep % self:getNumSteps()
     self.sequence:goToStep(targetStep, true)
@@ -203,7 +203,7 @@ local function changeAmount(tool)
     end
 end
 
-function ViewModel:onIncrease()
+function EditorViewModel:onIncrease()
     if self.selectedIdx == 0 then
         self.loadNextSong = true
     elseif self.selectedTool == tools.instrument then
@@ -218,7 +218,7 @@ function ViewModel:onIncrease()
     self.controlsNeedDisplay = true
 end
 
-function ViewModel:onDecrease()
+function EditorViewModel:onDecrease()
     if self.selectedIdx == 0 then
         self.loadPreviousSong = true
     elseif self.selectedTool == tools.instrument then
@@ -233,17 +233,17 @@ function ViewModel:onDecrease()
     self.controlsNeedDisplay = true
 end
 
-function ViewModel:setSelectedTrack(idx)
+function EditorViewModel:setSelectedTrack(idx)
     self.selectedIdx = idx
     self.controlsNeedDisplay = true
     end
 
-function ViewModel:setSelectedTool(toolEnum)
+function EditorViewModel:setSelectedTool(toolEnum)
     self.selectedTool = toolEnum
     self.controlsNeedDisplay = true
 end
 
-function ViewModel:update()
+function EditorViewModel:update()
     if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
         self:setSelectedTrack(self.selectedIdx + 1)
     elseif justPressed(buttonUp) and self.selectedIdx > 0 then
@@ -268,26 +268,26 @@ function ViewModel:update()
 end
 
 
-function ViewModel:crankDocked()
+function EditorViewModel:crankDocked()
     self.sequence:play()
 end
 
-function ViewModel:crankUndocked()
+function EditorViewModel:crankUndocked()
     self.sequence:stop()
 end
 
-function ViewModel:save()
+function EditorViewModel:save()
     print("saving", self.currentSongPath)
     playdate.datastore.write(self.trackProps, self.currentSongPath, true)
     setMessage("Saved : " .. self.currentSongPath .. ".json")
 end
 
-function ViewModel:finish()
+function EditorViewModel:finish()
     self:save()
     self.sequence:stop()
 end
 
-function ViewModel:keyReleased(key)
+function EditorViewModel:keyReleased(key)
     local trackNum = self.selectedIdx
     if key == "m" then
         self:toggleMuted(trackNum)
@@ -316,4 +316,10 @@ function ViewModel:keyReleased(key)
     elseif key == "j" then
         self:changeTrackProp(trackNum, "release", -0.1)
     end
+end
+
+function EditorViewModel:resume() end
+
+function EditorViewModel:gameWillPause()
+    self.sequence:stop()
 end

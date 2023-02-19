@@ -1,0 +1,33 @@
+import "EditorView"
+import "EditorViewModel"
+
+
+class("EditorScreen").extends()
+
+function EditorScreen:init(songPath)
+    EditorScreen.super.init(self)
+    
+    self.editorViewModel = EditorViewModel(songPath)
+    self.editorView = EditorView(self.editorViewModel)
+end
+
+function EditorScreen:pause()
+    self.editorViewModel:pause()
+end
+
+function EditorScreen:resume()
+    self.editorView:resume()
+end
+
+function EditorScreen:gameWillPause()
+    self.editorViewModel:gameWillPause()
+end
+
+function EditorScreen:destroy()
+    self.editorViewModel:destroy()
+end
+
+function EditorScreen:update()
+    self.editorViewModel:update()
+    self.editorView:draw(self.editorViewModel)
+end

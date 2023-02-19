@@ -11,8 +11,7 @@ import "enum"
 import "navigation/screen"
 local navigator <const> = import "navigation/navigator"
 import "model"
-import "ViewModel"
-import "View"
+import "editor/EditorScreen"
 import "fileselector/FileSelectorScreen"
 
 local datastore <const> = playdate.datastore
@@ -55,24 +54,6 @@ function setSongPath(newPath)
     datastore.write(config)
 end
 
-local function initNextSong()
-    if viewModel then
-        viewModel:finish()
-    end
-    setSongPath(selectNext(songPaths, getSongPath()))
-    viewModel = ViewModel(getSongPath())
-    view = View(viewModel)
-end
-
-local function initPreviousSong()
-    if viewModel then
-        viewModel:finish()
-    end
-    setSongPath(selectPrevious(songPaths, getSongPath()))
-    viewModel = ViewModel(getSongPath())
-    view = View(viewModel)
-end
-
 function playdate.update()
     navigator:updateActiveScreen()
 
@@ -106,16 +87,6 @@ function showMessage()
     gfx.popContext()
 end
 
-function playdate.keyReleased(key)
-    print("Released " .. key .. " key")
-
-    if key == "z" then
-        initNextSong()
-    else
-        viewModel:keyReleased(key)
-    end
-end
-
 function playdate.crankDocked()
     viewModel:crankDocked()
 end
@@ -125,8 +96,6 @@ function playdate.crankUndocked()
 end
 
 printTable(songPaths)
---viewModel = ViewModel(getSongPath())
---view = View(viewModel)
 
 local menu <const> = playdate.getSystemMenu()
 menu:addMenuItem("Save", function()
@@ -139,6 +108,7 @@ function playdate.gameWillResume() navigator:gameWillResume() end
 function playdate.deviceDidUnlock() navigator:gameWillResume() end
 
 pushScreen(FileSelectorScreen("Open file"))
+pushScreen(EditorScreen(getSongPath()))
 
 -- should remain last line to ensure activeScreen and proper navigation structure
 navigator:start()

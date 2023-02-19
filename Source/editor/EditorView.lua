@@ -27,31 +27,15 @@ local rowHeight <const> = 40
 local progressBarWidth <const> = 100
 local selectionWidth <const> = 2
 local progressBarX <const> = screenW - progressBarWidth - smallGutter
-local viewModel
-local listView = playdate.ui.gridview.new(0, rowHeight)
 local maxStripWidth <const> = 4000
-local trackStrips, stripWidth
-listView:setCellPadding(0, 0, 0, smallGutter) -- left, right , top, bottom
 
+class("EditorView").extends()
 
-class("View").extends()
-
-function View:init(vm)
-    gfx.clear(gfx.kColorWhite)
-    trackStrips = {}
-    viewModel = vm
-    if vm.numTracks == 0 then
-        self.error = "Number of tracks is 0. Was the filename spelled correctly?"
-        return
-    end
-
-    self.trackStripsBuilder = coroutine.create(self.buildStripsYielding)
-end
-
-function listView:drawInstrumentControls(row, selected, x, y, _, height)
+local function createDrawInstrumentControls(viewModel) return function(_, row, selected, x, y, _, height)
     gfx.pushContext()
 
     if selected then
+        print(x,y,trackControlsWidth, height)
         gfx.fillRect(x,y,trackControlsWidth,height)
     else
         gfx.drawRect(x,y,trackControlsWidth,height)
@@ -148,8 +132,12 @@ function listView:drawInstrumentControls(row, selected, x, y, _, height)
     end
     gfx.popContext()
 end
+end
 
-function listView:drawCell(_, row, _, selected, x, y, width, height)
+
+local function createListViewDrawCell(view, viewModel) return function (_,_, row, _, selected, x, y, width, height)
+    local listView = view.listView
+    local trackStrips = view.trackStrips
     if viewModel.controlsNeedDisplay or listView.needsDisplay or messageJustHidden then
         listView:drawInstrumentControls(row, selected, x, y, width, height)
     end
@@ -172,7 +160,7 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     -- notes (trackStrips)
     if trackStrips[row] then
         trackStrips[row]:draw(
-            trackControlsWidth - (viewModel:getProgress() * stripWidth),
+            trackControlsWidth - (viewModel:getProgress() * view.stripWidth),
             y
         )
     end
@@ -185,6 +173,29 @@ function listView:drawCell(_, row, _, selected, x, y, width, height)
     end
 
     gfx.popContext()
+
+end
+end
+
+function EditorView:init(vm)
+    gfx.clear(gfx.kColorWhite)
+    self.trackStrips = {}
+    self.stripWidth = 0
+    self.viewModel = vm
+    self.listView = playdate.ui.gridview.new(0, rowHeight)
+    local listView = self.listView
+    listView:setCellPadding(0, 0, 0, smallGutter) -- left, right , top, bottom
+
+    listView.view = self
+    listView.viewModel = viewModel
+    listView.drawInstrumentControls = createDrawInstrumentControls(self.viewModel)
+    listView.drawCell = createListViewDrawCell(self, self.viewModel)
+    if self.viewModel.numTracks == 0 then
+        self.error = "Number of tracks is 0. Was the filename spelled correctly?"
+        return
+    end
+
+    self.trackStripsBuilder = coroutine.create(self.buildStripsYielding)
 end
 
 function drawPot(text, x, y, value)
@@ -193,7 +204,8 @@ function drawPot(text, x, y, value)
     gfx.drawText(text, x-4, y-8)
 end
 
-function View:buildStripsYielding()
+function EditorView:buildStripsYielding()
+    local viewModel = self.viewModel
     local stepWindow = lume.clamp(viewModel:getTempo(), 1, 400)
     if isSimulator then
         stepWindow = stepWindow * 10
@@ -208,18 +220,18 @@ function View:buildStripsYielding()
         -- this would be too wide for comfort, bitmap size is limiting factor
         stepsPerPixel = numSteps / maxStripWidth
     end
-    stripWidth = numSteps / stepsPerPixel
-    print("steps per pixel", stepsPerPixel, "stripWidth", stripWidth)
-    listView:setNumberOfRows(numTracks)
+    self.stripWidth = numSteps / stepsPerPixel
+    print("steps per pixel", stepsPerPixel, "stripWidth", self.trackStrips)
+    self.listView:setNumberOfRows(numTracks)
     for i = 1, numTracks do
         coroutine.yield(0)
-        local curStrip = gfx.image.new(stripWidth, rowHeight)
-        trackStrips[i] = curStrip
+        local curStrip = gfx.image.new(self.stripWidth, rowHeight)
+        self.trackStrips[i] = curStrip
     end
     for step = 1, numSteps, stepWindow do
         coroutine.yield(step/numSteps)
         for i = 1, numTracks do
-            local curStrip = trackStrips[i]
+            local curStrip = self.trackStrips[i]
             gfx.pushContext(curStrip)
 
             local notes = viewModel:getNotes(i, step, step + stepWindow)
@@ -235,28 +247,27 @@ function View:buildStripsYielding()
     end
 end
 
-function View:drawStaticUI()
+function EditorView:drawStaticUI()
     gfx.pushContext()
     gfx.setColor(gfx.kColorWhite)
     gfx.fillRect(0,0, screenW, listY)
     gfx.setColor(gfx.kColorBlack)
     -- draw filename without escapes
-    font:drawText(viewModel.currentSongPath, 2,2)
+    font:drawText(self.viewModel.currentSongPath, 2,2)
     -- progress outline
     gfx.drawRect(progressBarX, smallGutter, progressBarWidth, 12)
     self.staticUIDrawn = true
     gfx.popContext()
 end
 
-function View:draw()
-
+function EditorView:draw(viewModel)
     if not self.staticUIDrawn or viewModel.controlsNeedDisplay then
         self:drawStaticUI()
     end
 
     local loadProgress = 0
     if coroutine.status(self.trackStripsBuilder) ~= "dead" then
-        _, loadProgress = coroutine.resume(self.trackStripsBuilder)
+        _, loadProgress = coroutine.resume(self.trackStripsBuilder, self)
         if type(loadProgress) == "string" then
             error(loadProgress)
         end
@@ -306,6 +317,7 @@ function View:draw()
         return
     end
 
+    local listView = self.listView
     if listView:getSelectedRow() ~= viewModel.selectedIdx then
         listView:setSelectedRow(viewModel.selectedIdx)
         listView:scrollToRow(viewModel.selectedIdx)
@@ -319,6 +331,8 @@ function View:draw()
     end
     listView:drawInRect(smallGutter, listY,screenW - smallGutter,240-listY)
     viewModel.controlsNeedDisplay = false
+end
 
-
+function EditorView:resume()
+    self.staticUIDrawn = false
 end
