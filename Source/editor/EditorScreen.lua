@@ -2,7 +2,7 @@ import "EditorView"
 import "EditorViewModel"
 
 
-class("EditorScreen").extends()
+class("EditorScreen").extends(Screen)
 
 function EditorScreen:init(songPath)
     EditorScreen.super.init(self)
@@ -21,6 +21,14 @@ end
 
 function EditorScreen:gameWillPause()
     self.editorViewModel:gameWillPause()
+end
+
+function EditorScreen:crankDocked()
+    self.editorViewModel:crankDocked()
+end
+
+function EditorScreen:crankUndocked()
+    self.editorViewModel:crankUndocked()
 end
 
 function EditorScreen:destroy()

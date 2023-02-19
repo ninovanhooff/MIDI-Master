@@ -2,7 +2,7 @@ import "FileSelectorView"
 import "FileSelectorViewModel"
 
 
-class("FileSelectorScreen").extends()
+class("FileSelectorScreen").extends(Screen)
 
 local fileSelectorView, fileSelectorViewModel
 
