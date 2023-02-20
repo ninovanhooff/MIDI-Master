@@ -6,10 +6,10 @@ class("FileSelectorScreen").extends(Screen)
 
 local fileSelectorView, fileSelectorViewModel
 
-function FileSelectorScreen:init(title)
+function FileSelectorScreen:init(title, onFileSelected)
     FileSelectorScreen.super.init(self)
     
-    fileSelectorViewModel = FileSelectorViewModel(title)
+    fileSelectorViewModel = FileSelectorViewModel(title, onFileSelected)
     fileSelectorView = FileSelectorView(fileSelectorViewModel)
 end
 

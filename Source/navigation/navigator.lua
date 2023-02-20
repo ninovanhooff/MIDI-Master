@@ -96,7 +96,7 @@ function navigatorNS.Navigator:executePendingNavigators()
             printT("Pausing screen", activeScreen.className, activeScreen)
             activeScreen:pause()
         end
-        print("remove all")
+
         menu:removeAllMenuItems()
         self:resumeActiveScreen()
     end

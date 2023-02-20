@@ -12,9 +12,10 @@ local clamp <const> = clamp
 
 class("FileSelectorViewModel").extends()
 
-function FileSelectorViewModel:init(title)
+function FileSelectorViewModel:init(title, onFileSelected)
     FileSelectorViewModel.super.init(self)
     self.title = title
+    self.onFileSelected = onFileSelected
     self.entries = {}
     for i, item in ipairs(songPaths) do
         self.entries[i] = {
@@ -72,9 +73,9 @@ function FileSelectorViewModel:update()
     elseif justPressed(buttonA) then
         self.aButtonPressedAtLeastOnce = true
     elseif justReleased(buttonA) and self.aButtonPressedAtLeastOnce then
+        popScreen()
         local path = self:selectedEntry().path
-        setSongPath(path)
-        pushScreen(EditorScreen(path))
+        self.onFileSelected(path)
     elseif justPressed(buttonB) then
         popScreen()
     end

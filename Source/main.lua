@@ -105,7 +105,7 @@ function playdate.deviceWillLock() navigator:gameWillPause() end
 function playdate.gameWillResume() navigator:gameWillResume() end
 function playdate.deviceDidUnlock() navigator:gameWillResume() end
 
-pushScreen(FileSelectorScreen("Open file"))
+
 pushScreen(EditorScreen(getSongPath()))
 
 -- should remain last line to ensure activeScreen and proper navigation structure

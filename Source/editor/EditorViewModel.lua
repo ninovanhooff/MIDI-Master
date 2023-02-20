@@ -319,12 +319,37 @@ function EditorViewModel:keyReleased(key)
     end
 end
 
-function EditorViewModel:resume()
+function EditorViewModel:addMenuItems()
+    menu:addMenuItem("Open", function()
+        pushScreen(FileSelectorScreen(
+            "Open file",
+            function(selectedPath)
+                clearNavigationStack()
+                setSongPath(selectedPath)
+                pushScreen(EditorScreen(selectedPath))
+            end
+        ))
+    end)
+
     menu:addMenuItem("Save", function()
         self:save()
     end)
 end
 
+function EditorViewModel:resume()
+    self.controlsNeedDisplay = true
+    self:addMenuItems()
+end
+
 function EditorViewModel:gameWillPause()
+    self:pause()
+end
+
+function EditorViewModel:pause()
     self.sequence:stop()
+    self:save()
+end
+
+function EditorViewModel:destroy()
+    self:pause()
 end
