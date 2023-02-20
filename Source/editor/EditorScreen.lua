@@ -11,11 +11,8 @@ function EditorScreen:init(songPath)
     self.editorView = EditorView(self.editorViewModel)
 end
 
-function EditorScreen:pause()
-    self.editorViewModel:pause()
-end
-
 function EditorScreen:resume()
+    self.editorViewModel:resume()
     self.editorView:resume()
 end
 

@@ -1,8 +1,11 @@
 local lume <const> = masterplayer.lume
+local playdate <const> = playdate
+local menu <const> = playdate.getSystemMenu()
 
 local pendingNavigators = {}
 local backStack = {}
 local activeScreen
+
 
 --- Usage:
 --- local navigator <const> = import "lua/navigator"
@@ -74,6 +77,13 @@ function navigatorNS.Navigator:resumeActiveScreen()
     activeScreen:resume()
 end
 
+--function navigatorNS.Navigator.removeAllMenuItems()
+--    printTable(playdate.menu)
+--    for _, item in ipairs(playdate.menu:getMenuItems()) do
+--        playdate.menu:removeMenuItem(item)
+--    end
+--end
+
 function navigatorNS.Navigator:executePendingNavigators()
     if #pendingNavigators > 0 then
         for _, navigator in ipairs(pendingNavigators) do
@@ -86,7 +96,8 @@ function navigatorNS.Navigator:executePendingNavigators()
             printT("Pausing screen", activeScreen.className, activeScreen)
             activeScreen:pause()
         end
-
+        print("remove all")
+        menu:removeAllMenuItems()
         self:resumeActiveScreen()
     end
 end

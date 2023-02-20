@@ -14,6 +14,7 @@ local abs <const> = math.abs
 
 local tools <const> = tools
 local floor <const> = math.floor
+local menu <const> = playdate.getSystemMenu()
 local getCrankChange <const> = playdate.getCrankChange
 local justPressed <const> = playdate.buttonJustPressed
 local buttonDown <const> = playdate.kButtonDown
@@ -318,7 +319,11 @@ function EditorViewModel:keyReleased(key)
     end
 end
 
-function EditorViewModel:resume() end
+function EditorViewModel:resume()
+    menu:addMenuItem("Save", function()
+        self:save()
+    end)
+end
 
 function EditorViewModel:gameWillPause()
     self.sequence:stop()
