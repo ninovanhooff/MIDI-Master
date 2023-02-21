@@ -237,7 +237,7 @@ end
 function EditorViewModel:setSelectedTrack(idx)
     self.selectedIdx = idx
     self.controlsNeedDisplay = true
-    end
+end
 
 function EditorViewModel:setSelectedTool(toolEnum)
     self.selectedTool = toolEnum
@@ -247,7 +247,7 @@ end
 function EditorViewModel:update()
     if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
         self:setSelectedTrack(self.selectedIdx + 1)
-    elseif justPressed(buttonUp) and self.selectedIdx > 0 then
+    elseif justPressed(buttonUp) and self.selectedIdx > 1 then
         self:setSelectedTrack(self.selectedIdx - 1)
     elseif justPressed(buttonLeft) then
         self:setSelectedTool(selectPreviousEnum(tools, self.selectedTool))
