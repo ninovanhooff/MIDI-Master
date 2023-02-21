@@ -35,7 +35,6 @@ local function createDrawInstrumentControls(viewModel) return function(_, row, s
     gfx.pushContext()
 
     if selected then
-        print(x,y,trackControlsWidth, height)
         gfx.fillRect(x,y,trackControlsWidth,height)
     else
         gfx.drawRect(x,y,trackControlsWidth,height)
