@@ -52,6 +52,15 @@ function setSongPath(newPath)
     datastore.write(config)
 end
 
+function isAutoSaveEnabled()
+    return config.autoSave
+end
+
+function setAutoSaveEnabled(isEnabled)
+    config.autoSave = isEnabled
+    datastore.write(config)
+end
+
 function playdate.update()
     navigator:update()
 

@@ -319,7 +319,14 @@ function EditorViewModel:keyReleased(key)
     end
 end
 
-function EditorViewModel:addMenuItems()
+function EditorViewModel:setMenuItems()
+    menu:removeAllMenuItems()
+
+    menu:addCheckmarkMenuItem("Auto-save", isAutoSaveEnabled(), function(isChecked)
+        print("eyo")
+        setAutoSaveEnabled(isChecked)
+        self:setMenuItems()
+    end)
     menu:addMenuItem("Open", function()
         pushScreen(FileSelectorScreen(
             "Open file",
@@ -331,14 +338,16 @@ function EditorViewModel:addMenuItems()
         ))
     end)
 
-    menu:addMenuItem("Save", function()
-        self:save()
-    end)
+    if not isAutoSaveEnabled() then
+        menu:addMenuItem("Save", function()
+            self:save()
+        end)
+    end
 end
 
 function EditorViewModel:resume()
     self.controlsNeedDisplay = true
-    self:addMenuItems()
+    self:setMenuItems()
 end
 
 function EditorViewModel:gameWillPause()
@@ -347,7 +356,9 @@ end
 
 function EditorViewModel:pause()
     self.sequence:stop()
-    self:save()
+    if isAutoSaveEnabled() then
+        self:save()
+    end
 end
 
 function EditorViewModel:destroy()
