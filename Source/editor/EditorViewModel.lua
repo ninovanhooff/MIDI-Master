@@ -236,7 +236,6 @@ end
 function EditorViewModel:load()
     local songPath = self.songPath
     self.trackProps = playdate.datastore.read(self.songPath)
-    print(songPath)
     self.sequence, self.trackProps = masterplayer.loadMidi(songPath, self.trackProps)
     if not self.sequence then
         -- trackProps should contain error
@@ -343,7 +342,6 @@ function EditorViewModel:setMenuItems()
     menu:removeAllMenuItems()
 
     menu:addCheckmarkMenuItem("Auto-save", isAutoSaveEnabled(), function(isChecked)
-        print("eyo")
         setAutoSaveEnabled(isChecked)
         self:setMenuItems()
     end)

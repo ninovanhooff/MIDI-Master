@@ -210,12 +210,7 @@ end
 function EditorView:buildStripsYielding()
     local viewModel = self.viewModel
     local nonEmptyTrackIndices = viewModel:getNonEmptyTrackIndices()
-    local stepWindow = floor(1000 - (viewModel:getTempo() * #nonEmptyTrackIndices)/10)
-    stepWindow = lume.clamp(stepWindow, 200,1000)
-    if isSimulator then
-        stepWindow = stepWindow * 10
-    end
-    print("stepWindow", stepWindow)
+    local dynamicStepWindow = 800
     local numSteps = viewModel:getNumSteps()
     local stepsPerPixel = lume.clamp(
         numSteps / screenW,
@@ -232,13 +227,14 @@ function EditorView:buildStripsYielding()
         local curStrip = gfx.image.new(self.stripWidth, rowHeight)
         self.trackStrips[trackIdx] = curStrip
     end
-    for step = 1, numSteps, stepWindow do
-        coroutine.yield(step/numSteps)
+    local step = 1
+    while step < numSteps do
+        local _, estimatedLoad = coroutine.yield(step/numSteps)
         for _, trackIdx in ipairs(nonEmptyTrackIndices) do
             local curStrip = self.trackStrips[trackIdx]
             gfx.pushContext(curStrip)
 
-            local notes = viewModel:getNotes(trackIdx, step, step + stepWindow)
+            local notes = viewModel:getNotes(trackIdx, step, step + dynamicStepWindow)
             for _, note in ipairs(notes) do
                 local y = ((127-note.note) / 127) * rowHeight
                 gfx.drawLine(
@@ -248,6 +244,15 @@ function EditorView:buildStripsYielding()
             end
             gfx.popContext()
         end
+
+        step = step + dynamicStepWindow
+        if estimatedLoad > 0.9 then
+            dynamicStepWindow = floor(dynamicStepWindow * 0.9)
+        elseif estimatedLoad < 0.6 then
+            dynamicStepWindow = floor(dynamicStepWindow * 1.1)
+        end
+        dynamicStepWindow = lume.clamp(dynamicStepWindow,100, 5000)
+        print("load and window", estimatedLoad, dynamicStepWindow)
     end
 end
 
@@ -275,14 +280,14 @@ function EditorView:songLoaded()
     self.listView:setNumberOfRows(self.viewModel.numTracks)
 end
 
-function EditorView:draw(viewModel)
+function EditorView:draw(viewModel, estimatedLoad)
     if not self.staticUIDrawn or viewModel.controlsNeedDisplay then
         self:drawStaticUI()
     end
 
     local loadProgress = 0
     if coroutine.status(self.trackStripsBuilder) ~= "dead" then
-        _, loadProgress = coroutine.resume(self.trackStripsBuilder, self)
+        _, loadProgress = coroutine.resume(self.trackStripsBuilder, self, estimatedLoad)
         if type(loadProgress) == "string" then
             error(loadProgress)
         end

@@ -1,12 +1,15 @@
 import "EditorView"
 import "EditorViewModel"
 
+local getRefreshRate <const> = playdate.display.getRefreshRate
+local currentTime <const> = playdate.sound.getCurrentTime
 
 class("EditorScreen").extends(Screen)
 
 function EditorScreen:init(songPath)
     EditorScreen.super.init(self)
-    
+
+    self.estimatedLoad = 0.5
     self.editorViewModel = EditorViewModel(songPath)
     self.editorView = EditorView(self.editorViewModel)
 end
@@ -33,6 +36,7 @@ function EditorScreen:destroy()
 end
 
 function EditorScreen:update()
+    local startTime = currentTime()
     if not self.editorViewModel.loaded then
         self.editorView:drawLoading(self.editorViewModel.songPath)
         coroutine.yield() -- flush screen updates
@@ -40,5 +44,8 @@ function EditorScreen:update()
         self.editorView:songLoaded()
     end
     self.editorViewModel:update()
-    self.editorView:draw(self.editorViewModel)
+    self.editorView:draw(self.editorViewModel, self.estimatedLoad)
+    local elapsedMillis = (currentTime() - startTime)*1000
+    local targetMillis = 1000 / getRefreshRate()
+    self.estimatedLoad = elapsedMillis / targetMillis
 end
