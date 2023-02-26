@@ -271,7 +271,7 @@ end
 
 function EditorView:drawLoading(songPath)
     local text = "Loading " .. songPath .. " . . ."
-    local w,h = gfx.getTextSize(text)
+    local w,h = font:getTextWidth(text), font:getHeight()
     gfx.clear(gfx.kColorWhite)
     font:drawText(text, 200- w/2, 120 - h/2, kTextAlignment.center)
 end
