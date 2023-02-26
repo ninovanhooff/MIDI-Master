@@ -140,38 +140,42 @@ local function createListViewDrawCell(view, viewModel) return function (_,_, row
     if viewModel.controlsNeedDisplay or listView.needsDisplay or messageJustHidden then
         listView:drawInstrumentControls(row, selected, x, y, width, height)
     end
-    gfx.pushContext()
 
-    -- clipRect for notes area
-    gfx.setClipRect(x+trackControlsWidth, max(y, listY), width, height)
-    gfx.setColor(gfx.kColorWhite)
-    gfx.fillRect(x+trackControlsWidth, y, width, height)
-    gfx.setColor(gfx.kColorBlack)
-
-    -- Shade silenced tracks
-    if viewModel:isSilenced(row) then
+    if listView.needsDisplay or #viewModel:trackNotes(row) > 0 then
         gfx.pushContext()
-        gfx.setDitherPattern(0.8, gfx.image.kDitherTypeDiagonalLine) -- invert alpha due to bug in SDK
-        gfx.fillRect(trackControlsWidth, y+1, width - trackControlsWidth, height)
+        -- clipRect for notes area
+        gfx.setClipRect(x+trackControlsWidth, max(y, listY), width, height)
+        gfx.setColor(gfx.kColorWhite)
+        gfx.fillRect(x+trackControlsWidth, y, width, height)
+        gfx.setColor(gfx.kColorBlack)
+
+        -- Shade silenced tracks
+        if viewModel:isSilenced(row) then
+            gfx.pushContext()
+            gfx.setDitherPattern(0.8, gfx.image.kDitherTypeDiagonalLine) -- invert alpha due to bug in SDK
+            gfx.fillRect(trackControlsWidth, y+1, width - trackControlsWidth, height)
+            gfx.popContext()
+        end
+
+        -- notes (trackStrips)
+        if trackStrips[row] then
+            trackStrips[row]:draw(
+                trackControlsWidth - (viewModel:getProgress() * view.stripWidth),
+                y
+            )
+        end
+
+
+        -- note info
+        local activeNotesText = viewModel:getNotesActive(row)
+        if isSimulator then
+            gfx.drawText(activeNotesText, screenW - font:getTextWidth(activeNotesText), y + gutter)
+        end
+
         gfx.popContext()
     end
 
-    -- notes (trackStrips)
-    if trackStrips[row] then
-        trackStrips[row]:draw(
-            trackControlsWidth - (viewModel:getProgress() * view.stripWidth),
-            y
-        )
-    end
 
-
-    -- note info
-    local activeNotesText = viewModel:getNotesActive(row)
-    if isSimulator then
-        gfx.drawText(activeNotesText, screenW - font:getTextWidth(activeNotesText), y + gutter)
-    end
-
-    gfx.popContext()
 
 end
 end
@@ -205,11 +209,13 @@ end
 
 function EditorView:buildStripsYielding()
     local viewModel = self.viewModel
-    local stepWindow = lume.clamp(viewModel:getTempo(), 1, 400)
+    local nonEmptyTrackIndices = viewModel:getNonEmptyTrackIndices()
+    local stepWindow = floor(1000 - (viewModel:getTempo() * #nonEmptyTrackIndices)/10)
+    stepWindow = lume.clamp(stepWindow, 200,1000)
     if isSimulator then
         stepWindow = stepWindow * 10
     end
-    local numTracks = viewModel.numTracks
+    print("stepWindow", stepWindow)
     local numSteps = viewModel:getNumSteps()
     local stepsPerPixel = lume.clamp(
         numSteps / screenW,
@@ -220,20 +226,19 @@ function EditorView:buildStripsYielding()
         stepsPerPixel = numSteps / maxStripWidth
     end
     self.stripWidth = numSteps / stepsPerPixel
-    print("steps per pixel", stepsPerPixel, "stripWidth", self.trackStrips)
-    self.listView:setNumberOfRows(numTracks)
-    for i = 1, numTracks do
+    print("steps per pixel", stepsPerPixel)
+    for _, trackIdx in ipairs(nonEmptyTrackIndices) do
         coroutine.yield(0)
         local curStrip = gfx.image.new(self.stripWidth, rowHeight)
-        self.trackStrips[i] = curStrip
+        self.trackStrips[trackIdx] = curStrip
     end
     for step = 1, numSteps, stepWindow do
         coroutine.yield(step/numSteps)
-        for i = 1, numTracks do
-            local curStrip = self.trackStrips[i]
+        for _, trackIdx in ipairs(nonEmptyTrackIndices) do
+            local curStrip = self.trackStrips[trackIdx]
             gfx.pushContext(curStrip)
 
-            local notes = viewModel:getNotes(i, step, step + stepWindow)
+            local notes = viewModel:getNotes(trackIdx, step, step + stepWindow)
             for _, note in ipairs(notes) do
                 local y = ((127-note.note) / 127) * rowHeight
                 gfx.drawLine(
@@ -264,6 +269,10 @@ function EditorView:drawLoading(songPath)
     local w,h = gfx.getTextSize(text)
     gfx.clear(gfx.kColorWhite)
     gfx.drawText(text, 200- w/2, 120 - h/2, kTextAlignment.center)
+end
+
+function EditorView:songLoaded()
+    self.listView:setNumberOfRows(self.viewModel.numTracks)
 end
 
 function EditorView:draw(viewModel)

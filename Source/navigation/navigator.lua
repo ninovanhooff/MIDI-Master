@@ -68,7 +68,7 @@ end
 function navigatorNS.Navigator:resumeActiveScreen()
     if #backStack < 1 then
         printT("ERROR: No active screen, adding Start Screen")
-        table.insert(backStack, FileSelectorScreen())
+        table.insert(backStack, FileSelectorScreen()) --todo create factory function for FileSelectorScreen
     end
 
     activeScreen = backStack[#backStack]
@@ -76,13 +76,6 @@ function navigatorNS.Navigator:resumeActiveScreen()
     playdate.setCollectsGarbage(true) -- prevent permanently disabled GC by previous Screen
     activeScreen:resume()
 end
-
---function navigatorNS.Navigator.removeAllMenuItems()
---    printTable(playdate.menu)
---    for _, item in ipairs(playdate.menu:getMenuItems()) do
---        playdate.menu:removeMenuItem(item)
---    end
---end
 
 function navigatorNS.Navigator:executePendingNavigators()
     if #pendingNavigators > 0 then

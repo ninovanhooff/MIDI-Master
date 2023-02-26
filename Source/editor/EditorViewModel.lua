@@ -149,6 +149,21 @@ function EditorViewModel:getADSR(trackNum)
         props.release
 end
 
+--- unique midi note numbers present in track
+function EditorViewModel:trackNotes(trackNum)
+    return self.trackProps[trackNum].notes
+end
+
+function EditorViewModel:getNonEmptyTrackIndices()
+    local result = {}
+    for i, trackProps in ipairs(self.trackProps) do
+        if #trackProps.notes > 0 then
+            table.insert(result, i)
+        end
+    end
+    return result
+end
+
 function EditorViewModel:changeTrackProp(trackNum, key, amount)
     local trackProps = self.trackProps[trackNum]
     local track = self:getTrack(trackNum)

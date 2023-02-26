@@ -37,6 +37,7 @@ function EditorScreen:update()
         self.editorView:drawLoading(self.editorViewModel.songPath)
         coroutine.yield() -- flush screen updates
         self.editorViewModel:load()
+        self.editorView:songLoaded()
     end
     self.editorViewModel:update()
     self.editorView:draw(self.editorViewModel)
