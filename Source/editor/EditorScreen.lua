@@ -33,6 +33,11 @@ function EditorScreen:destroy()
 end
 
 function EditorScreen:update()
+    if not self.editorViewModel.loaded then
+        self.editorView:drawLoading(self.editorViewModel.songPath)
+        coroutine.yield() -- flush screen updates
+        self.editorViewModel:load()
+    end
     self.editorViewModel:update()
     self.editorView:draw(self.editorViewModel)
 end

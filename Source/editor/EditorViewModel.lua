@@ -27,33 +27,7 @@ local buttonB <const> = playdate.kButtonB
 class("EditorViewModel").extends()
 
 function EditorViewModel:init(songPath)
-    self.currentSongPath = songPath
-    self.trackProps = playdate.datastore.read(self.currentSongPath)
-    print(songPath, trackProps)
-    self.sequence, self.trackProps = masterplayer.loadMidi(songPath, self.trackProps)
-    if not self.sequence then
-        -- trackProps should contain error
-        error(self.trackProps)
-    end
-
-    print("Sequence length (steps)", self.sequence:getLength())
-    print("Sequence tempo", self.sequence:getTempo())
-    self.numTracks = self.sequence:getTrackCount()
-    for i = 1, self.numTracks do
-        local synth
-        if i == 10 then
-            synth = "drums"
-        else
-            synth = snd.kWaveSawtooth
-        end
-    end
-    self.selectedIdx = 1
-    self.selectedTool = tools.attack
-    self:applyMuteAndSolo()
-    self.crankSpeed = self.sequence:getTempo() / 4
-    self.sequence:play()
-    ---
-    self.controlsNeedDisplay = true
+    self.songPath = songPath
 end
 
 function EditorViewModel:getTempo()
@@ -244,6 +218,37 @@ function EditorViewModel:setSelectedTool(toolEnum)
     self.controlsNeedDisplay = true
 end
 
+function EditorViewModel:load()
+    local songPath = self.songPath
+    self.trackProps = playdate.datastore.read(self.songPath)
+    print(songPath)
+    self.sequence, self.trackProps = masterplayer.loadMidi(songPath, self.trackProps)
+    if not self.sequence then
+        -- trackProps should contain error
+        error(self.trackProps)
+    end
+
+    print("Sequence length (steps)", self.sequence:getLength())
+    print("Sequence tempo", self.sequence:getTempo())
+    self.numTracks = self.sequence:getTrackCount()
+    for i = 1, self.numTracks do
+        local synth
+        if i == 10 then
+            synth = "drums"
+        else
+            synth = snd.kWaveSawtooth
+        end
+    end
+    self.selectedIdx = 1
+    self.selectedTool = tools.attack
+    self:applyMuteAndSolo()
+    self.crankSpeed = self.sequence:getTempo() / 4
+    self.sequence:play()
+    ---
+    self.controlsNeedDisplay = true
+    self.loaded = true
+end
+
 function EditorViewModel:update()
     if justPressed(buttonDown) and self.selectedIdx < self.numTracks then
         self:setSelectedTrack(self.selectedIdx + 1)
@@ -278,9 +283,9 @@ function EditorViewModel:crankUndocked()
 end
 
 function EditorViewModel:save()
-    print("saving", self.currentSongPath)
-    playdate.datastore.write(self.trackProps, self.currentSongPath, true)
-    setMessage("Saved : " .. self.currentSongPath .. ".json")
+    print("saving", self.songPath)
+    playdate.datastore.write(self.trackProps, self.songPath, true)
+    setMessage("Saved : " .. self.songPath .. ".json")
 end
 
 function EditorViewModel:finish()

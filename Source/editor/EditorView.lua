@@ -252,11 +252,18 @@ function EditorView:drawStaticUI()
     gfx.fillRect(0,0, screenW, listY)
     gfx.setColor(gfx.kColorBlack)
     -- draw filename without escapes
-    font:drawText(self.viewModel.currentSongPath, 2,2)
+    font:drawText(self.viewModel.songPath, 2,2)
     -- progress outline
     gfx.drawRect(progressBarX, smallGutter, progressBarWidth, 12)
     self.staticUIDrawn = true
     gfx.popContext()
+end
+
+function EditorView:drawLoading(songPath)
+    local text = "Loading " .. songPath .. " . . ."
+    local w,h = gfx.getTextSize(text)
+    gfx.clear(gfx.kColorWhite)
+    gfx.drawText(text, 200- w/2, 120 - h/2, kTextAlignment.center)
 end
 
 function EditorView:draw(viewModel)
@@ -307,7 +314,7 @@ function EditorView:draw(viewModel)
         gfx.pushContext()
         gfx.setLineWidth(selectionWidth)
         gfx.setPattern({0x88, 0x44, 0x22, 0x11, 0x88, 0x44, 0x22, 0x11})
-        gfx.drawRoundRect(1,1, font:getTextWidth(viewModel.currentSongPath) + 4, 18, 2)
+        gfx.drawRoundRect(1,1, font:getTextWidth(viewModel.songPath) + 4, 18, 2)
         gfx.popContext()
     end
 
