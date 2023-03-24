@@ -9,7 +9,7 @@ local lume <const> = masterplayer.lume
 import "util"
 import "enum"
 import "navigation/Screen"
-local navigator <const> = import "navigation/navigator"
+local navigator <const> = import "navigation/Navigator"
 import "model"
 import "editor/EditorScreen"
 import "fileselector/FileSelectorScreen"
