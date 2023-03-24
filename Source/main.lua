@@ -8,7 +8,7 @@ import "CoreLibs/crank"
 local lume <const> = masterplayer.lume
 import "util"
 import "enum"
-import "navigation/screen"
+import "navigation/Screen"
 local navigator <const> = import "navigation/navigator"
 import "model"
 import "editor/EditorScreen"
