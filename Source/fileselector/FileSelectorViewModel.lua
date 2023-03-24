@@ -95,6 +95,10 @@ function FileSelectorViewModel:gameWillPause()
     self:keyTimerRemover()
 end
 
+function FileSelectorViewModel:deviceWillLock()
+    self:keyTimerRemover()
+end
+
 function FileSelectorViewModel:destroy()
     self:pause()
     if self.videoViewModel then

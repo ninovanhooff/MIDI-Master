@@ -25,6 +25,10 @@ function FileSelectorScreen:gameWillPause()
     fileSelectorViewModel:gameWillPause()
 end
 
+function FileSelectorScreen:deviceWillLock()
+    fileSelectorViewModel:deviceWillLock()
+end
+
 function FileSelectorScreen:destroy()
     fileSelectorViewModel:destroy()
 end

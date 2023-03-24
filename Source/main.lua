@@ -109,9 +109,9 @@ menu:addMenuItem("Save", function()
 end)
 
 function playdate.gameWillPause() navigator:gameWillPause() end
-function playdate.deviceWillLock() navigator:gameWillPause() end
+function playdate.deviceWillLock() navigator:deviceWillLock() end
 function playdate.gameWillResume() navigator:gameWillResume() end
-function playdate.deviceDidUnlock() navigator:gameWillResume() end
+function playdate.deviceDidUnlock() navigator:deviceDidUnlock() end
 
 
 pushScreen(EditorScreen(getSongPath()))
