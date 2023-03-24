@@ -3,7 +3,8 @@
         "github.com/ninovanhooff/master-player-choir-ah": "main",
         "github.com/ninovanhooff/master-player-drums-electric": "main",
         "github.com/ninovanhooff/master-player-drums-pd": "main",
-        "github.com/ninovanhooff/master-player": "main"
+        "github.com/ninovanhooff/master-player": "main",
+        "github.com/ninovanhooff/playdate-navigator": "main"
     },
     "installed": {
         "github.com/ninovanhooff/master-player": "main@369966f36ee6fb5a7ed859b71f53b12ef40b8186"

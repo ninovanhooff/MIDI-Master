@@ -33,3 +33,14 @@ function FileSelectorScreen:update()
     fileSelectorViewModel:update()
     fileSelectorView:render(fileSelectorViewModel)
 end
+
+function FileSelectorScreen.createMidiPicker()
+    return FileSelectorScreen(
+        "Open file",
+        function(selectedPath)
+            clearNavigationStack()
+            setSongPath(selectedPath)
+            pushScreen(EditorScreen(selectedPath))
+        end
+    )
+end

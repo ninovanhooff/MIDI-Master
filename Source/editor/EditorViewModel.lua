@@ -346,14 +346,7 @@ function EditorViewModel:setMenuItems()
         self:setMenuItems()
     end)
     menu:addMenuItem("Open", function()
-        pushScreen(FileSelectorScreen(
-            "Open file",
-            function(selectedPath)
-                clearNavigationStack()
-                setSongPath(selectedPath)
-                pushScreen(EditorScreen(selectedPath))
-            end
-        ))
+        pushScreen(FileSelectorScreen.createMidiPicker())
     end)
 
     if not isAutoSaveEnabled() then

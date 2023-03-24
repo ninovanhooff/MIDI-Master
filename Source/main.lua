@@ -8,8 +8,6 @@ import "CoreLibs/crank"
 local lume <const> = masterplayer.lume
 import "util"
 import "enum"
-import "navigation/Screen"
-local navigator <const> = import "navigation/Navigator"
 import "model"
 import "editor/EditorScreen"
 import "fileselector/FileSelectorScreen"
@@ -26,16 +24,17 @@ masterplayer.addInstrument(com_ninovanhooff_masterplayer_drums_electric, "Drums-
 masterplayer.addInstrument(com_ninovanhooff_masterplayer_drums_pd, "Drums-PD")
 
 songPaths = lume.filter(
-    listFilesRecursive(),
-    function(filename)
-        return endsWith(string.lower(filename), ".mid")
-    end
+listFilesRecursive(),
+function(filename)
+    return endsWith(string.lower(filename), ".mid")
+end
 )
 
 if #songPaths < 1 then
     error("No songs found. Place your .mid files in the 'songs' folder inside the MIDI Master pdx" )
 end
 
+local navigator <const> = Navigator()
 local config = datastore.read() or { currentSongPath = songPaths[1] }
 
 
