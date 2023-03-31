@@ -28,6 +28,13 @@ class("EditorViewModel").extends()
 
 function EditorViewModel:init(songPath)
     self.songPath = songPath
+    self.synthReferences = {}
+end
+
+function EditorViewModel:createInstrument(trackProps)
+    local inst, addedSynths = masterplayer.createInstrument(trackProps)
+    self.synthReferences = lume.concat(self.synthReferences, addedSynths)
+    return inst
 end
 
 function EditorViewModel:getTempo()
@@ -118,11 +125,11 @@ function EditorViewModel:toggleSolo(trackNum)
 end
 
 function EditorViewModel:applyInstrument(trackNum, props)
-    local polyphony = self:getTrack(trackNum):getPolyphony()
-    local newInstrument = masterplayer.createInstrument(polyphony, props)
+    local newInstrument = self:createInstrument(props)
     self:getTrack(trackNum):setInstrument(newInstrument)
     -- calling play again will apply the changes to the running sequence
     self.sequence:play()
+    print("Changed track", trackNum, "new refCount:", #self.synthReferences)
     self.controlsNeedDisplay = true
 end
 
@@ -172,9 +179,8 @@ function EditorViewModel:changeTrackProp(trackNum, key, amount)
         0, 1
     )
     printTable(trackProps)
-    track:setInstrument(masterplayer.createInstrument(
-        track:getPolyphony(), trackProps
-    ))
+    track:setInstrument(self:createInstrument(trackProps))
+    print("Changed track", trackNum, "new refCount:", #self.synthReferences)
     self.sequence:play()
     self.controlsNeedDisplay = true
 end
@@ -240,6 +246,18 @@ function EditorViewModel:load()
     if not self.sequence then
         -- trackProps should contain error
         error(self.trackProps)
+    end
+
+    self.sequence, self.trackProps = masterplayer.loadMidi(songPath, self.trackProps)
+    local sequence, trackProps = self.sequence, self.trackProps
+    if not sequence then
+        self.error = trackProps
+    else
+        for i,item in ipairs(trackProps) do
+            local inst, addedSynths = masterplayer.createInstrument(item)
+            self.synthReferences = lume.concat(self.synthReferences, addedSynths)
+            sequence:getTrackAtIndex(i):setInstrument(inst)
+        end
     end
 
     print("Sequence length (steps)", self.sequence:getLength())
@@ -374,4 +392,10 @@ end
 
 function EditorViewModel:destroy()
     self:pause()
+
+    for i=1, self.numTracks do
+        self:getTrack(i):clearNotes()
+    end
+    self.sequence = nil
+    self.synthReferences = nil
 end
