@@ -221,7 +221,6 @@ function EditorView:buildStripsYielding()
         stepsPerPixel = numSteps / maxStripWidth
     end
     self.stripWidth = numSteps / stepsPerPixel
-    print("steps per pixel", stepsPerPixel)
     for _, trackIdx in ipairs(nonEmptyTrackIndices) do
         coroutine.yield(0)
         local curStrip = gfx.image.new(self.stripWidth, rowHeight)
@@ -252,7 +251,6 @@ function EditorView:buildStripsYielding()
             dynamicStepWindow = floor(dynamicStepWindow * 1.1)
         end
         dynamicStepWindow = lume.clamp(dynamicStepWindow,100, 5000)
-        print("load and window", estimatedLoad, dynamicStepWindow)
     end
 end
 
