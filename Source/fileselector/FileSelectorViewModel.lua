@@ -101,7 +101,4 @@ end
 
 function FileSelectorViewModel:destroy()
     self:pause()
-    if self.videoViewModel then
-        self.videoViewModel:destroy()
-    end
 end
