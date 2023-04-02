@@ -33,9 +33,7 @@ In a terminal, navigate to the folder where this READMe.md file is located and e
 - select dpad up to select the song title and press A to save the current master and load the next song
 - A: increase selected parameter value
 - B: Decrease selected parameter value
-- Crank: scrobble song (rewind / fast forward) \
-  Please be aware that there is a bug in the SDK that prevents scrobbling past a certain point.
-  Normal playback till the end of the song is possible, however.
+- Crank: scrobble song (rewind / fast forward)
 
 ### Keyboard controls
 
@@ -47,7 +45,7 @@ for the mappings
 ## Add your own sampled instruments (for Developers)
 
 MIDI Master comes with a few bundled sampled instruments. These are included as [Toyboxes](https://github.com/toyboxpy/toybox.py).
-To add your own instrument, create a Toybox out of it. As inspiration,
+To add your own instrument, create a Toybox out of it.
 
 Steps to add your own instrument to MIDI Master:
 
