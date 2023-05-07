@@ -36,6 +36,9 @@ end
 
 local navigator <const> = Navigator()
 local config = datastore.read() or { currentSongPath = songPaths[1] }
+if not playdate.file.exists(config.currentSongPath) then
+    config.currentSongPath = songPaths[1]
+end
 
 
 local messageRect <const> = playdate.geometry.rect.new(0, screenH - 20, screenW, 20)
