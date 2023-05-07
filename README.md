@@ -39,7 +39,7 @@ In a terminal, navigate to the folder where this READMe.md file is located and e
 
 Keyboard controls can be used in simulator or when using the simulator to control the device.
 
-See the bottom part of [ViewModel.lua](https://github.com/ninovanhooff/MIDI-Master/blob/main/Source/ViewModel.lua)
+See the bottom part of [ViewModel.lua](https://github.com/ninovanhooff/MIDI-Master/blob/main/Source/editor/EditorViewModel.lua)
 for the mappings
 
 ## Add your own sampled instruments (for Developers)
