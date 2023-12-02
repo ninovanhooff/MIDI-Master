@@ -1,6 +1,12 @@
-# MIDI Master
+# MIDI Master (Playdate)
 
-A tool for mastering MIDI files.
+A tool for mastering MIDI files. Masters can be played back as background music in a Playdate Lua SDK game.
+
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/X_TIjVMSLE8/0.jpg)](https://www.youtube.com/watch?v=X_TIjVMSLE8)
+
+Click the image for a demo video on Youtube.
+
+The resulting songs can be integrated into a Playdate game using the [Master Player](https://github.com/ninovanhooff/master-player) component
 
 Masters are saved in the Data folder.
 This folder is created when you first save a master. On Mac, the location of that folder is `~/Developer/PlaydateSDK/Disk/Data/com.ninovanhooff.midimaster`
